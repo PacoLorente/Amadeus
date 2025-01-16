@@ -662,6 +662,10 @@ Main
 ;
 ;	Se produce MOVIMIENTO. Intercambio de Álbumes, (borrado-pintado).
 
+	di
+	jr $
+	ei
+
 	ld hl,Tabla_de_pintado
 	ld (India_SP),hl
 
@@ -1427,7 +1431,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-	call Recompone_posicion_inicio
+;	call Recompone_posicion_inicio
 
 1 call Draw
 
