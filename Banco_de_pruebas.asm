@@ -662,10 +662,6 @@ Main
 ;
 ;	Se produce MOVIMIENTO. Intercambio de Álbumes, (borrado-pintado).
 
-	di
-	jr $
-	ei
-
 	ld hl,Tabla_de_pintado
 	ld (India_SP),hl
 
@@ -732,9 +728,13 @@ Main
 
 ; -------------------------------------------
 
-3 call Entidad_a_Tabla_de_pintado								; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+3 call Obtenemos_puntero_de_impresion							; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.			ok.
+;																; También nos proporciona (Columnas).
+
+	push de 													; Aparta (Puntero_objeto).
+	call Entidad_a_Tabla_de_pintado								; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
-	call Obtenemos_puntero_de_impresion							; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.			ok.
+	pop de 														; Recoge (Puntero_objeto).
 
 	push ix														; Push .db (Tipo) de la entidad, (caja de entidades correspondiente).
 	ld ix,(Puntero_de_impresion)
