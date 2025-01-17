@@ -1259,7 +1259,7 @@ Entidad_a_Tabla_de_pintado
 Inicializa_India_y_limpia_Tabla_de_impresion 
 
 	ld hl,(India_SP)
-	ld bc,Tabla_de_pintado+24							; Bytes de (Tabla_de_pintado)-1.
+	ld bc,Indice_de_almacenes_de_mov_masticados-1		; Bytes de (Tabla_de_pintado)-1.
 
 	ld a,c
 	sub l
@@ -1298,12 +1298,12 @@ Ordena_tabla_de_impresion
 	ret c 										; Tiene que haber 4 (Entidades_en_curso) en pantalla para poder ejecutar esta rutina.
 
 	dec a
-	ld c,a 										; (Entidades_en_curso)-1 en C. Puede haber menos de 7 ebtidades.
+	ld c,a 										; (Entidades_en_curso)-1 en C. Puede haber menos de 7 entidades.
 	ld d,c 										; Copia de respaldo.
 
 	ld a,(hl)									; Nº de Fila de la 1ª entidad, (1er byte de la tabla).
 
-	ld hl,Tabla_de_pintado+3
+	ld hl,Tabla_de_pintado+4
 	ld b,(hl)
 	ld (India_2_SP),hl
 
@@ -1369,6 +1369,7 @@ Avanza_India_2_SP
 	inc l
 	inc l
 	inc l
+	inc l
 
 	ld b,(hl)
 	ld (India_2_SP),hl 							; Siguiente entidad en la Tabla.
@@ -1385,15 +1386,20 @@ Avanza_punteros_indios
 	ld c,d
 
 	ld hl,(India_SP)
+
 	inc l
 	inc l
 	inc l
+	inc l
+
 	ld a,(hl)
 	ld (India_SP),hl
 
 	inc l
 	inc l
 	inc l
+	inc l
+
 	ld b,(hl)
 	ld (India_2_SP),hl
 
@@ -1431,7 +1437,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-;	call Recompone_posicion_inicio
+	call Recompone_posicion_inicio
 
 1 call Draw
 
@@ -2058,7 +2064,7 @@ Limpia_caja_de_entidades
 
 ; ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
 ;
-;	4/6/24
+;	17/1/25
 ;
 ;	Es la 1ª rutina que se ejcuta tras la rutina de interrupciones.
 ; 	
@@ -2067,14 +2073,23 @@ Limpia_caja_de_entidades
 
 Actualiza_pantalla 
 
-;	jr $
-
 	ld a,2	
 	out ($fe),a												
 
 	ld a,(Ctrl_3)
 	bit 2,a
 	jr z,Ejecuta_escudo                                             ; No hay movimiento de entidades. Saltamos a Amadeus.
+
+; Inicializamos el "Puntero_de_columnas", (Puntero_indice_mov).
+
+	ld bc,Indice_Sprite_der+1										; Vamos a utilizar los 7 bytes de: (Indice_Sprite_der) defw 0
+	ld (Puntero_indice_mov),bc
+;                                                                                                      (Indice_Sprite_izq) defw 0
+;                                                                                                      (Puntero_DESPLZ_der) defw 0
+;                                                                                                      (Puntero_DESPLZ_izq) defw 0
+;
+;																	; para almacenar/leer la variable (Columnas) de las distintas entidades. De esta forma utilizaremos la misma rutina_
+;																	; _de pintado para pintar y borrar.
 
 Borrando_entidades
 
@@ -2083,11 +2098,35 @@ Borrando_entidades
 	inc h
 	dec h
 	jr z,Pintando_entidades
+
+; Borrando entidades, pero antes... indicamos (Columnas).
+
+	ld bc,(Puntero_indice_mov)
+	ld a,(bc)
+
+	ld (Columnas),a
+
+	xor a
+	ld (bc),a
+	inc c
+	ld (Puntero_indice_mov),bc
+
 	call Pinta_Sprites
 	jr Borrando_entidades
 	
 Pintando_entidades
 
+
+; Inicializamos el "Puntero_de_columnas", (Puntero_indice_mov).
+
+	ld bc,Indice_Sprite_der+1										; Vamos a utilizar los 7 bytes de: (Indice_Sprite_der) defw 0
+	ld (Puntero_indice_mov),bc
+;                                                                                                      (Indice_Sprite_izq) defw 0
+;                                                                                                      (Puntero_DESPLZ_der) defw 0
+;                                                                                                      (Puntero_DESPLZ_izq) defw 0
+;
+;																	; para almacenar/leer la variable (Columnas) de las distintas entidades. De esta forma utilizaremos la misma rutina_
+;																	; _de pintado para pintar y borrar.
 	ld hl,(India_SP)
 	inc l
 	call Extrae_address
@@ -2097,8 +2136,15 @@ Pintando_entidades
 	inc e
 	inc e
 
-	ld a,(de)
+	ld a,(de)														; Extraemos (Columnas) de la tabla de pintado. La rutina [Pinta_Sprites] necesita conocer el nº de columnas_
+;																	; _ para elegir la sub-rutina apropiada.
 	ld (Columnas),a
+
+	ld bc,(Puntero_indice_mov)
+	ld (bc),a
+	inc c
+	ld (Puntero_indice_mov),bc
+
 	inc e
 
 	ld (India_SP),de

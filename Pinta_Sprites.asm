@@ -29,11 +29,7 @@ Pinta_Sprites
 
 Pinta_rapido                            ;   1520 t/states.
 
-;   jr $
-
-    ex af,af
-
-;   ld a,(Columnas)
+    ld a,(Columnas)
     dec a
     jp z,Pinta_rapido_1_Columna
     dec a
@@ -685,9 +681,7 @@ Pinta_rapido_1_Columna
 
 Pinta_lento
 
-    ex af,af
-
-;   ld a,(Columnas)
+    ld a,(Columnas)
     dec a
     jr z,Pinta_lento_1_Columna
     dec a
