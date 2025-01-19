@@ -513,8 +513,8 @@ START
 
 ; Limpiamos pantalla.
 
-	ld a,%00000111
-	call Cls
+;	ld a,%00000111
+;	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 INICIALIZACION
@@ -1300,6 +1300,10 @@ Ordena_tabla_de_impresion
 	cp 4 	;	4
 	ret c 										; Tiene que haber 4 (Entidades_en_curso) en pantalla para poder ejecutar esta rutina.
 
+	di
+	jr $
+	ei
+
 	dec a
 	ld c,a 										; (Entidades_en_curso)-1 en C. Puede haber menos de 7 entidades.
 	ld d,c 										; Copia de respaldo.
@@ -2028,7 +2032,7 @@ Pintando_entidades
 ;
 ;																	; para almacenar/leer la variable (Columnas) de las distintas entidades. De esta forma utilizaremos la misma rutina_
 ;																	; _de pintado para pintar y borrar.
-	ld hl,(India_SP)
+2 ld hl,(India_SP)
 	inc l
 	call Extrae_address
 	inc h
@@ -2051,7 +2055,7 @@ Pintando_entidades
 	ld (India_SP),de
 	call Extrae_address
 	call Pinta_Sprites
-	jr Pintando_entidades
+	jr 2B
 
 ; --------------------- ----------------------- ---------------------- ---------------------- ---------------
 

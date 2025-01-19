@@ -179,22 +179,25 @@ Mov_right ld a,(Ctrl_0)
 	call Stop_Amadeus_right											; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
 	ret z 															; Salimos de Mov_right si hemos llegado al char.30.
 
-;;	ld hl,Ctrl_0
-;;	set 4,(hl)
 	jr 8F
 
-10 
-;	ld hl,Ctrl_0
-;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
-; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
-; 																	; _ en el caso de que no lo haya.
-	ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
+10 ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
 	cp 31															; Si no es así, saltamos a [3] para seguir con el desplazamiento progrmado.
 	jr nz,8F
 
 	ld a,(CTRL_DESPLZ) 		 										; Estamos en el último char. de la línea. Si (CTRL_DESPLZ)="0" saltamos a_	 									
 	and a 															; _[3] para continuar con el DESPLZ.
 	jr z,8F 														 														
+
+	di
+	jr $
+	ei
+
+;	CTRL_DESPLZ $8bfe
+;	(Puntero_objeto) $8bfc
+;	(Posicion_actual) $8bfa
+;	(Columnas) $8c0a
+;	(Puntero_de_impresion) $8bef
 
 ; ---------- ---------- ----------
 ;
@@ -227,8 +230,7 @@ Mov_right ld a,(Ctrl_0)
 
 ; ---------- ---------- ----------
 
-3 
-	call Reaparece_izquierda 										; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+3 call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
 ;	call Reinicio
 
 ; ---------- ---------- ----------
@@ -413,10 +415,6 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 ;
 Mov_left 
 
-;	ld hl,Ctrl_0
-;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
-; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
-; 																	; _ en el caso de que no lo haya.
 	ld a,(Ctrl_0)
 	bit 6,a
 	jr z,11F 														; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que que no hemos llegado al char.1 de la línea, [Stop_Amadeus].
@@ -428,6 +426,16 @@ Mov_left
 11 ld a,(Coordenada_X)	 	 								
 	and a 															
 	jr nz,8F
+
+	di
+	jr $
+	ei
+
+;	CTRL_DESPLZ $8bfe
+;	(Puntero_objeto) $8bfc
+;	(Posicion_actual) $8bfa
+;	(Columnas) $8c0a
+;	(Puntero_de_impresion) $8bef
 
 	ld a,(CTRL_DESPLZ) 			 									; Si el Sprite no está en el 1er char de la línea, (desaparece por la izquierda), o estando en este, _
 	and a 															; _ (CTRL_DESPLZ)="0", cargamos HL con la (Posicion_actual) y ejecutamos la rutina de desplazamiento, _
@@ -691,7 +699,9 @@ Dec_CTRL_DESPLZ ld hl,CTRL_DESPLZ
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 
-Reaparece_derecha ld hl,(Posicion_actual)	 					
+Reaparece_derecha 
+
+	ld hl,(Posicion_actual)	 					
 	ld bc,31 														
 	and a
 	adc hl,bc
@@ -702,8 +712,10 @@ Reaparece_derecha ld hl,(Posicion_actual)
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 
-Reaparece_izquierda ld hl,(Posicion_actual)	 					
-	ld bc,31 														
+Reaparece_izquierda 
+
+	ld hl,(Posicion_actual)	 					
+	ld bc,31														
 	and a
 	sbc hl,bc
 	ld (Posicion_actual),hl 											; $xx1x
