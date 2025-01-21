@@ -588,9 +588,25 @@ Main
 ;
 ; 07/11/24.
 
+;	ld a,(Entidades_en_curso)
+;	and a
+;	jr z,7F
+
+
+;	ld hl,(Puntero_de_impresion)
+;	ld a,l
+;	and $1f
+;	di
+;	jr z,$
+;	ei
+
+
+
+
+
 ; Gestión de disparos.
 
-	call Change_Disparos								; Intercambiamos los álbumes de disparos.
+7 call Change_Disparos								; Intercambiamos los álbumes de disparos.
 	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 
@@ -1448,6 +1464,7 @@ Construye_movimientos_masticados_entidad
 
 1 call Draw
 
+
 ; -----------------------------------------------------------
 
 ;	CTRL_DESPLZ $8bfe
@@ -1460,18 +1477,9 @@ Construye_movimientos_masticados_entidad
 ;	(Columns) $8bf9
 ;	(Cuad_objeto) $8c09
 
-	ld hl,(Posicion_actual)
-	ld a,l
-	and $1f
-	cp $1f
-	jr nz,2F
-
-	ld a,1
-	ld (Columnas),a
-
 ; ------------------------------------------------------------
 
-2 call Codifica_movimiento
+	call Codifica_movimiento
 	call Guarda_movimiento_masticado
 
 	call Movimiento
@@ -1577,7 +1585,7 @@ Dos_Columnas ld a,ixh
 	ld ixh,a
 
 	ld a,(Coordenada_X)	
-	dec a
+	and a
 	ret nz
 
 	inc iyl

@@ -195,6 +195,9 @@ Mov_right ld a,(Ctrl_0)
 ;	(Columnas) $8c0a
 ;	(Puntero_de_impresion) $8bef
 
+;	jr $
+
+
 ; ---------- ---------- ----------
 ;
 ;	Estamos en el último char. de la fila y (CTRL_DESPLZ) es distinto de "0".
@@ -228,10 +231,11 @@ Mov_right ld a,(Ctrl_0)
 
 3 call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
 ;	call Reinicio
+	call Draw
 
 ; ---------- ---------- ----------
 ;
-;	Esta parte de la rutina se encarga de hacer que el Sprite aparezca pixel a pixel por la izquierda.
+;	Esta parte de la rutina se encarga de hacer que el Sprite aparezca pixel a pixel por la izquierda.;
 
 	ld b,2 															; Para hacer que el objeto aparezca poco a poco, hemos de desplazarlo 2 veces: El primer desplazamiento_
 5 push bc 															; _pone (CTRL_DESPLZ) a "0" y el segundo a "$ff". Con esto hacemos que el Sprite tenga espacio en blanco delante_
@@ -239,9 +243,12 @@ Mov_right ld a,(Ctrl_0)
 	pop bc
 	djnz 5B
 	ld hl,(Posicion_actual) 										; Decrementamos su posición actual, pués al desplazarlo a la derecha, volvemos a incrementar el nº de (Columns) y _
-	dec hl 															; _ (Posicion_actual) ha pasado de $00 a $01.
+	dec l 															; _ (Posicion_actual) ha pasado de $00 a $01.
 	ld (Posicion_actual),hl
 	call Genera_coordenadas
+
+;	jr $
+
 	ret
 
 ;	CTRL_DESPLZ $8bfe
@@ -251,6 +258,7 @@ Mov_right ld a,(Ctrl_0)
 ;	(Puntero_de_impresion) $8bef
 ;	(Puntero_DESPLZ_der) $8c03
 ;	(Puntero_DESPLZ_izq) $8c05
+;	(Cuad_objeto) $8c09
 
 ; ---------- ---------- ----------
 
@@ -360,9 +368,11 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 	ld (Posicion_actual),hl
 	call Genera_coordenadas
 	call Inc_CTRL_DESPLZ
-	jr 2F
+	ret
+
 1 call Inc_CTRL_DESPLZ
-2 ret
+
+	ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
