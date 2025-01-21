@@ -1448,15 +1448,39 @@ Construye_movimientos_masticados_entidad
 
 1 call Draw
 
-	call Codifica_movimiento
+; -----------------------------------------------------------
+
+;	CTRL_DESPLZ $8bfe
+;	(Puntero_objeto) $8bfc
+;	(Posicion_actual) $8bfa
+;	(Columnas) $8c0a
+;	(Puntero_de_impresion) $8bef
+;	(Puntero_DESPLZ_der) $8c03
+;	(Puntero_DESPLZ_izq) $8c05
+;	(Columns) $8bf9
+;	(Cuad_objeto) $8c09
+
+	ld hl,(Posicion_actual)
+	ld a,l
+	and $1f
+	cp $1f
+	jr nz,2F
+
+	ld a,1
+	ld (Columnas),a
+
+; ------------------------------------------------------------
+
+2 call Codifica_movimiento
 	call Guarda_movimiento_masticado
 
 	call Movimiento
 
-	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
+	ld a,(Ctrl_3)												; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
 	bit 1,a 												; _ que corresponde a esta entidad.
 	jr z,1B
 
+;	MOVIMIENTOS COMPLETADOS !!!!!!!!!!!!!!!!!!!!
 ;	Hemos completado el almacén de movimientos masticados de la entidad.
 ;	Reinicializamos (Puntero_de_almacen_de_mov_masticados).
 

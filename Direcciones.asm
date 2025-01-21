@@ -189,10 +189,6 @@ Mov_right ld a,(Ctrl_0)
 	and a 															; _[3] para continuar con el DESPLZ.
 	jr z,8F 														 														
 
-	di
-	jr $
-	ei
-
 ;	CTRL_DESPLZ $8bfe
 ;	(Puntero_objeto) $8bfc
 ;	(Posicion_actual) $8bfa
@@ -246,13 +242,21 @@ Mov_right ld a,(Ctrl_0)
 	dec hl 															; _ (Posicion_actual) ha pasado de $00 a $01.
 	ld (Posicion_actual),hl
 	call Genera_coordenadas
-	jr 2F 															; Salimos para pintar la nueva posición.
+	ret
+
+;	CTRL_DESPLZ $8bfe
+;	(Puntero_objeto) $8bfc
+;	(Posicion_actual) $8bfa
+;	(Columnas) $8c0a
+;	(Puntero_de_impresion) $8bef
+;	(Puntero_DESPLZ_der) $8c03
+;	(Puntero_DESPLZ_izq) $8c05
 
 ; ---------- ---------- ----------
 
 8 ld hl,(Posicion_actual)
 	call DESPLZ_DER
-2 ret
+	ret
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
@@ -426,10 +430,6 @@ Mov_left
 11 ld a,(Coordenada_X)	 	 								
 	and a 															
 	jr nz,8F
-
-	di
-	jr $
-	ei
 
 ;	CTRL_DESPLZ $8bfe
 ;	(Puntero_objeto) $8bfc
@@ -701,26 +701,30 @@ Dec_CTRL_DESPLZ ld hl,CTRL_DESPLZ
 
 Reaparece_derecha 
 
+	ld hl,Ctrl_0														; $xxx1
+	set 0,(hl)
+
 	ld hl,(Posicion_actual)	 					
 	ld bc,31 														
 	and a
 	adc hl,bc
 	ld (Posicion_actual),hl
-	ld hl,Ctrl_0														; $xxx1
-	set 0,(hl)
+
 	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 
 Reaparece_izquierda 
 
+	ld hl,Ctrl_0
+	set 1,(hl)
+
 	ld hl,(Posicion_actual)	 					
 	ld bc,31														
 	and a
 	sbc hl,bc
 	ld (Posicion_actual),hl 											; $xx1x
-	ld hl,Ctrl_0
-	set 1,(hl)
+
 	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
