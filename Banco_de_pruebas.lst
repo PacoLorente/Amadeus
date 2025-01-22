@@ -858,75 +858,65 @@
  245+ 8A09 00 00        	defw 0 												; (Contador_de_mov_masticados).
  246+ 8A0B 00           	db 0												; (Velocidad).
  247+ 8A0C
- 248+ 8A0C              ; ---------- ---------- ---------- ---------- ----------
- 249+ 8A0C
- 250+ 8A0C              ;Caja_7 db 0,0,0											; (Tipo) / (Coordenada_X) / (Coordenada_Y)..
- 251+ 8A0C              ;	db 0 												; (Contador_de_vueltas).
- 252+ 8A0C              ;	db 0												; (Impacto).
- 253+ 8A0C              ;	defw 0												; (Puntero_de_impresion).
- 254+ 8A0C              ;	defw 0												; (Puntero_de_almacen_de_mov_masticados).
- 255+ 8A0C              ;	defw 0 												; (Contador_de_mov_masticados).
- 256+ 8A0C              ;	db 0												; (Velocidad).
- 257+ 8A0C
- 258+ 8A0C              ; -------------------------------------------------------------------------------------
- 259+ 8A0C              ;
- 260+ 8A0C              ;	06/12/24
- 261+ 8A0C              ;
- 262+ 8A0C              ;	TIPOS de "Entidades maliciosas" que quieren conquistar la Tierra.
- 263+ 8A0C              ;
- 264+ 8A0C              ;	Notas de funcionamiento: (Cuad_objeto) siempre será "1" independientemente de su (Posicion_inicio).
- 265+ 8A0C              ;		De no ser así, la rutina [Recompone_posicion_inicio] generará problemas a la hora de hacer que_
- 266+ 8A0C              ;		_ la entidad aparezca `al píxel', por la parte derecha de la pantalla. Esto se debe a como están_
- 267+ 8A0C              ;		_ construidas las rutinas [Mov_right] y [Mov_left].
- 268+ 8A0C
- 269+ 8A0C              Indice_de_definiciones_de_entidades
- 270+ 8A0C
- 271+ 8A0C 10 8A        	defw Entidad_1
- 272+ 8A0E 1D 8A        	defw Entidad_2
- 273+ 8A10
- 274+ 8A10              ;	DEFINICIONES DE ENTIDADES. (20 Bytes).
- 275+ 8A10
- 276+ 8A10              ;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------
- 277+ 8A10
- 278+ 8A10 81 02 02     Entidad_1 db $81,2,2		                     		; (Tipo) / (Filas) / (Columns).
- 279+ 8A13 01           	db 1												; (Contador_de_vueltas). Valor inicial "2": Sólo una vuelta lenta. "1" Dos vueltas lentas.
- 280+ 8A14 30 85        	defw Indice_Badsat_der								; (Indice_Sprite_der).
- 281+ 8A16 8E 83        	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
- 282+ 8A18
- 283+ 8A18              ; Aleatoriedad en la posición de inicio de la entidad.
- 284+ 8A18              ; BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
- 285+ 8A18
- 286+ 8A18 21 47        Pos_inicio_entidad1	defw $4721				            ; (Posicion_inicio).
- 287+ 8A1A 00           	db 0												; (Cuad_objeto).
- 288+ 8A1B
- 289+ 8A1B C0 DD        	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
- 290+ 8A1D
- 291+ 8A1D              ;	-----------------------------------------------------------------------------------------------------------------------------------------------------------------
- 292+ 8A1D
- 293+ 8A1D 81 02 02     Entidad_2 db $81,2,2		                   			; (Tipo) / (Filas) / (Columns).
- 294+ 8A20 01           	db 1												; (Contador_de_vueltas).
- 295+ 8A21 30 85        	defw Indice_Badsat_der								; (Indice_Sprite_der).
- 296+ 8A23 8E 83        	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
- 297+ 8A25 40 50        	defw $5040                                      	; (Posicion_inicio).
- 298+ 8A27 01           	db 1												; (Cuad_objeto).
- 299+ 8A28 C0 DD        	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
- 300+ 8A2A
- 301+ 8A2A              ; -------------------------------------------------------------------------------------
- 302+ 8A2A              ;
- 303+ 8A2A              ;	28/05/24
- 304+ 8A2A              ;
- 305+ 8A2A              ;	Definición de Amadeus.
- 306+ 8A2A              ;
- 307+ 8A2A              ;	Amadeus no utiliza el parámetro: (Contador_de_vueltas). Lo colocamos a "0".
- 308+ 8A2A              ;	Inicialmente situamos a Amadeus en el centro de la pantalla.
- 309+ 8A2A
- 310+ 8A2A 00 02 02     Definicion_Amadeus db 0,2,2		                     	; (Tipo) / (Filas) / (Columns).
- 311+ 8A2D 00           	db 0												; (Contador_de_vueltas).
- 312+ 8A2E C0 86        	defw Indice_Amadeus_der								; (Indice_Sprite_der).
- 313+ 8A30 D0 86        	defw Indice_Amadeus_izq								; (Indice_Sprite_izq).
- 314+ 8A32 C1 50        	defw $50c1	                                     	; (Posicion_inicio).
- 315+ 8A34 03           	db 3												; (Cuad_objeto).
- 316+ 8A35 DC DB        	defw Almacen_de_movimientos_masticados_Amadeus		; (Puntero_de_almacen_de_mov_masticados).
+ 248+ 8A0C              ; -------------------------------------------------------------------------------------
+ 249+ 8A0C              ;
+ 250+ 8A0C              ;	06/12/24
+ 251+ 8A0C              ;
+ 252+ 8A0C              ;	TIPOS de "Entidades maliciosas" que quieren conquistar la Tierra.
+ 253+ 8A0C              ;
+ 254+ 8A0C              ;	Notas de funcionamiento: (Cuad_objeto) siempre será "1" independientemente de su (Posicion_inicio).
+ 255+ 8A0C              ;		De no ser así, la rutina [Recompone_posicion_inicio] generará problemas a la hora de hacer que_
+ 256+ 8A0C              ;		_ la entidad aparezca `al píxel', por la parte derecha de la pantalla. Esto se debe a como están_
+ 257+ 8A0C              ;		_ construidas las rutinas [Mov_right] y [Mov_left].
+ 258+ 8A0C
+ 259+ 8A0C              Indice_de_definiciones_de_entidades
+ 260+ 8A0C
+ 261+ 8A0C 10 8A        	defw Entidad_1
+ 262+ 8A0E 1D 8A        	defw Entidad_2
+ 263+ 8A10
+ 264+ 8A10              ;	DEFINICIONES DE ENTIDADES. (20 Bytes).
+ 265+ 8A10
+ 266+ 8A10              ;	BADSAT, (Satélite malvado). ------------------------------------------------------------------------------------------------------------------------------------
+ 267+ 8A10
+ 268+ 8A10 81 02 02     Entidad_1 db $81,2,2		                     		; (Tipo) / (Filas) / (Columns).
+ 269+ 8A13 01           	db 1												; (Contador_de_vueltas). Valor inicial "2": Sólo una vuelta lenta. "1" Dos vueltas lentas.
+ 270+ 8A14 30 85        	defw Indice_Badsat_der								; (Indice_Sprite_der).
+ 271+ 8A16 8E 83        	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
+ 272+ 8A18
+ 273+ 8A18              ; Aleatoriedad en la posición de inicio de la entidad.
+ 274+ 8A18              ; BadSat siempre aparecerá por la parte superior de la pantalla, $40xx. (Cuad_objeto) tendrá valor 1 o 2 dependiendo de si aparece por la mitad izquierda o derecha.
+ 275+ 8A18
+ 276+ 8A18 21 47        Pos_inicio_entidad1	defw $4721				            ; (Posicion_inicio).
+ 277+ 8A1A 00           	db 0												; (Cuad_objeto).
+ 278+ 8A1B
+ 279+ 8A1B C0 DD        	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
+ 280+ 8A1D
+ 281+ 8A1D              ;	-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 282+ 8A1D
+ 283+ 8A1D 81 02 02     Entidad_2 db $81,2,2		                   			; (Tipo) / (Filas) / (Columns).
+ 284+ 8A20 01           	db 1												; (Contador_de_vueltas).
+ 285+ 8A21 30 85        	defw Indice_Badsat_der								; (Indice_Sprite_der).
+ 286+ 8A23 8E 83        	defw Indice_Badsat_izq								; (Indice_Sprite_izq).
+ 287+ 8A25 40 50        	defw $5040                                      	; (Posicion_inicio).
+ 288+ 8A27 01           	db 1												; (Cuad_objeto).
+ 289+ 8A28 C0 DD        	defw Almacen_de_movimientos_masticados_Entidad_1	; (Puntero_de_almacen_de_mov_masticados)
+ 290+ 8A2A
+ 291+ 8A2A              ; -------------------------------------------------------------------------------------
+ 292+ 8A2A              ;
+ 293+ 8A2A              ;	28/05/24
+ 294+ 8A2A              ;
+ 295+ 8A2A              ;	Definición de Amadeus.
+ 296+ 8A2A              ;
+ 297+ 8A2A              ;	Amadeus no utiliza el parámetro: (Contador_de_vueltas). Lo colocamos a "0".
+ 298+ 8A2A              ;	Inicialmente situamos a Amadeus en el centro de la pantalla.
+ 299+ 8A2A
+ 300+ 8A2A 00 02 02     Definicion_Amadeus db 0,2,2		                     	; (Tipo) / (Filas) / (Columns).
+ 301+ 8A2D 00           	db 0												; (Contador_de_vueltas).
+ 302+ 8A2E C0 86        	defw Indice_Amadeus_der								; (Indice_Sprite_der).
+ 303+ 8A30 D0 86        	defw Indice_Amadeus_izq								; (Indice_Sprite_izq).
+ 304+ 8A32 C1 50        	defw $50c1	                                     	; (Posicion_inicio).
+ 305+ 8A34 03           	db 3												; (Cuad_objeto).
+ 306+ 8A35 DC DB        	defw Almacen_de_movimientos_masticados_Amadeus		; (Puntero_de_almacen_de_mov_masticados).
 # file closed: Cajas_y_disparos.asm
  148  8A37              	include "Patrones_de_mov.asm"
 # file opened: Patrones_de_mov.asm
