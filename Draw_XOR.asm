@@ -566,8 +566,7 @@ Calcula_puntero_de_impresion
 ;
 ;	17/01/25
 ;
-;	HL ..... (Puntero_de_impresion).
-;	IY ..... (Puntero_objeto).
+;	INPUTS: HL contiene (Puntero_de_impresion).
 
 Codifica_Puntero_de_impresion
 

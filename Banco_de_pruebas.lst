@@ -5731,172 +5731,172 @@
  566+ 9C05              ;
  567+ 9C05              ;	17/01/25
  568+ 9C05              ;
- 569+ 9C05              ;	HL ..... (Puntero_de_impresion).
- 570+ 9C05              ;	IY ..... (Puntero_objeto).
- 571+ 9C05
- 572+ 9C05              Codifica_Puntero_de_impresion
- 573+ 9C05
- 574+ 9C05 3A 0A 8C     	ld a,(Columnas)
- 575+ 9C08 3D           	dec a
- 576+ 9C09 28 04        	jr z,Una_Columna
- 577+ 9C0B 3D           	dec a
- 578+ 9C0C 28 17        	jr z,Dos_Columnas
- 579+ 9C0E C9           	ret
- 580+ 9C0F
- 581+ 9C0F CB EC        Una_Columna set 5,h				; X01X
- 582+ 9C11 CB B4        	res 6,h
- 583+ 9C13
- 584+ 9C13 E5           	push hl
- 585+ 9C14 DD E1        	pop ix						; (Puntero_de_impresion) codificado en IX.
- 586+ 9C16
- 587+ 9C16 3A 09 8C     	ld a,(Cuad_objeto)
- 588+ 9C19 E6 01        	and 1
- 589+ 9C1B C8           	ret z
- 590+ 9C1C
- 591+ 9C1C              ;	Cuadrantes 1 y 3:
- 592+ 9C1C
- 593+ 9C1C 2A FC 8B     	ld hl,(Puntero_objeto)
- 594+ 9C1F 2C           	inc l
- 595+ 9C20 2C           	inc l
- 596+ 9C21
- 597+ 9C21 E5           	push hl
- 598+ 9C22 FD E1        	pop iy						; (Puntero_objeto) en IY.
- 599+ 9C24
- 600+ 9C24 C9           	ret
- 601+ 9C25
- 602+ 9C25 CB FC        Dos_Columnas set 7,h
- 603+ 9C27 CB B4        	res 6,h
- 604+ 9C29
- 605+ 9C29 E5           	push hl
- 606+ 9C2A DD E1        	pop ix						; (Puntero_de_impresion) codificado en IX.
- 607+ 9C2C
- 608+ 9C2C 3A 09 8C     	ld a,(Cuad_objeto)
- 609+ 9C2F E6 01        	and 1
- 610+ 9C31 C8           	ret z
- 611+ 9C32
- 612+ 9C32              ;	Cuadrantes 1 y 3:
- 613+ 9C32
- 614+ 9C32 3A F9 8B     	ld a,(Columns)
- 615+ 9C35 E6 01        	and 1
- 616+ 9C37 C8           	ret z
- 617+ 9C38
- 618+ 9C38 2A FC 8B     	ld hl,(Puntero_objeto)
- 619+ 9C3B 2C           	inc l
- 620+ 9C3C
- 621+ 9C3C E5           	push hl
- 622+ 9C3D FD E1        	pop iy						; (Puntero_objeto) en IY.
- 623+ 9C3F
- 624+ 9C3F C9           	ret
- 625+ 9C40
- 626+ 9C40              ; --------------------------------------------------------------------------------------------------------------------
- 627+ 9C40              ;
- 628+ 9C40              ;	2/1/23
- 629+ 9C40              ;
- 630+ 9C40              ;	Sub-rutina de [Calcula_puntero_de_impresion].
- 631+ 9C40              ;
- 632+ 9C40              ;	Tras esta rutina tenemos:
- 633+ 9C40              ;
- 634+ 9C40              ;	OUTPUT: HL contiene (Posicion_actual).
- 635+ 9C40              ;			B contiene (Columnas)-1. Nota: Este valor `nunca' será "0". El valor mínimo es "1".
- 636+ 9C40              ;
- 637+ 9C40              ;	DESTRUYE!!!!! HL,B y A.
- 638+ 9C40
- 639+ 9C40 2A FA 8B     Operandos ld hl,(Posicion_actual)
- 640+ 9C43 3A 0A 8C     	ld a,(Columnas)
- 641+ 9C46 3D           	dec a
- 642+ 9C47 20 01        	jr nz,1F
- 643+ 9C49 3C           	inc a
- 644+ 9C4A 47           1 ld b,a
- 645+ 9C4B C9           	ret
- 646+ 9C4C
- 647+ 9C4C              ; --------------------------------------------------------------------------------------------------------------------
- 648+ 9C4C              ;
- 649+ 9C4C              ;	Prepara_draw
- 650+ 9C4C              ;
- 651+ 9C4C              ;	Es una rutina de carga.
- 652+ 9C4C              ;	Carga los registros BC,HL y E para posteriormente llamar a la rutina de pintado [DRAW].
- 653+ 9C4C              ;
- 654+ 9C4C              ;	FUNCIONAMIENTO:
- 655+ 9C4C              ;
- 656+ 9C4C              ;	- LD (Filas/Columns) del objeto a pintar en [BC].
- 657+ 9C4C              ;	- LD (Posicion_actual) del objeto en [HL].
- 658+ 9C4C              ;	- LD E,0. (Dígito de control utilizado por Draw para cálculos internos de la rutina. Ha de estar a "0").
- 659+ 9C4C              ;
- 660+ 9C4C              ;	DESTRUYE:
- 661+ 9C4C              ;
- 662+ 9C4C              ;	Logicamente, BC,HL y E quedan destruidos.
- 663+ 9C4C
- 664+ 9C4C 21 F8 8B     Prepara_draw ld hl,Filas 		 					 					 ; Prepara los registros BC, E y HL.
- 665+ 9C4F 46           	ld b,(hl) 														     ; Carga Filas/Columns del objeto a pintar o inicializar en BC.
- 666+ 9C50 23           	inc hl 												 				 ; Carga (Posicion_actual) en HL.
- 667+ 9C51 4E           	ld c,(hl)
- 668+ 9C52 2A FA 8B     	ld hl,(Posicion_actual)
- 669+ 9C55 1E 00        	ld e,0 																 ; Byte de control. Ha de estar a "0" cuando llamamos a [DRAW].
- 670+ 9C57 C9           	ret
- 671+ 9C58
- 672+ 9C58              ;----------------------------------------------------------------------------------------------------------------
- 673+ 9C58              ;
- 674+ 9C58              ;	5/08/22
- 675+ 9C58              ;
- 676+ 9C58              ;   NextScan.
- 677+ 9C58              ;
- 678+ 9C58              ;   Calcula la dirección de mem. de pantalla donde se sitúa el siguiente scanline. (Inc H, línea abajo).
- 679+ 9C58              ;
- 680+ 9C58              ;   INPUT: HL contendra la dirección de mem. de video sobre la que queremos calcular el siguiente scanline.
- 681+ 9C58              ;
- 682+ 9C58              ;   OUTPUT: HL contendrá la nueva dirección de memoria de pantalla.
- 683+ 9C58              ;
- 684+ 9C58              ;       DESTRUIDOS: AF y HL !!!
- 685+ 9C58              ;
- 686+ 9C58              ;   010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
- 687+ 9C58              ;
- 688+ 9C58
- 689+ 9C58 24           NextScan inc h          ; Incrementamos el scanline.
- 690+ 9C59 7C               ld a,h
- 691+ 9C5A E6 07            and 7
- 692+ 9C5C C0               ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
- 693+ 9C5D
- 694+ 9C5D 7D           	ld a,l              ; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
- 695+ 9C5E C6 20            add a,$20           ; Vamos a comprobarlo...
- 696+ 9C60 6F               ld l,a
- 697+ 9C61 D8               ret c               ; Salimos si se produce el cambio de tercio.
- 698+ 9C62
- 699+ 9C62 7C               ld a,h              ; No estamos en la última línea del tercio, por lo que inicializamos H restando una_
- 700+ 9C63 D6 08            sub 8               ; _unidad a los bits que definen el tercio TT, (sub $08).
- 701+ 9C65 67               ld h,a
- 702+ 9C66 C9               ret
- 703+ 9C67
- 704+ 9C67              ;----------------------------------------------------------------------------------------------------------------
- 705+ 9C67              ;
- 706+ 9C67              ;	5/08/22
- 707+ 9C67              ;
- 708+ 9C67              ;   PreviousScan.
- 709+ 9C67              ;
- 710+ 9C67              ;   Calcula la dirección de mem. de pantalla donde se sitúa el scanline anterior. (Dec H, línea arriba).
- 711+ 9C67              ;
- 712+ 9C67              ;   INPUT: HL contendra la dirección de mem. de video sobre la que queremos calcular el scanline anterior.
- 713+ 9C67              ;
- 714+ 9C67              ;   OUTPUT: HL contendrá la nueva dirección de memoria de pantalla.
- 715+ 9C67              ;
- 716+ 9C67              ;       DESTRUIDOS: AF y HL !!!
- 717+ 9C67              ;
- 718+ 9C67              ;   010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
- 719+ 9C67              ;
- 720+ 9C67
- 721+ 9C67 7C           PreviousScan ld a,h
- 722+ 9C68 25               dec h               ; Dec H.
- 723+ 9C69 E6 07            and 7
- 724+ 9C6B C0               ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
- 725+ 9C6C
- 726+ 9C6C 7D               ld a,l              ; Estabamos en el scanline "0" y al decrementar nos situamos en el "7" y cambiamos de tercio.
- 727+ 9C6D D6 20            sub $20             ; Vamos a comprobarlo...
- 728+ 9C6F 6F               ld l,a
- 729+ 9C70 D8               ret c               ; Salimos si estábamos en la primera línea y se produce el cambio de tercio.
- 730+ 9C71
- 731+ 9C71 7C               ld a,h              ; No estamos en la primera línea del tercio, por lo que inicializamos H sumando una_
- 732+ 9C72 C6 08            add a,8             ; _unidad a los bits que definen el tercio TT, (add a,$08).
- 733+ 9C74 67               ld h,a
- 734+ 9C75 C9               ret
+ 569+ 9C05              ;	INPUTS: HL contiene (Puntero_de_impresion).
+ 570+ 9C05
+ 571+ 9C05              Codifica_Puntero_de_impresion
+ 572+ 9C05
+ 573+ 9C05 3A 0A 8C     	ld a,(Columnas)
+ 574+ 9C08 3D           	dec a
+ 575+ 9C09 28 04        	jr z,Una_Columna
+ 576+ 9C0B 3D           	dec a
+ 577+ 9C0C 28 17        	jr z,Dos_Columnas
+ 578+ 9C0E C9           	ret
+ 579+ 9C0F
+ 580+ 9C0F CB EC        Una_Columna set 5,h				; X01X
+ 581+ 9C11 CB B4        	res 6,h
+ 582+ 9C13
+ 583+ 9C13 E5           	push hl
+ 584+ 9C14 DD E1        	pop ix						; (Puntero_de_impresion) codificado en IX.
+ 585+ 9C16
+ 586+ 9C16 3A 09 8C     	ld a,(Cuad_objeto)
+ 587+ 9C19 E6 01        	and 1
+ 588+ 9C1B C8           	ret z
+ 589+ 9C1C
+ 590+ 9C1C              ;	Cuadrantes 1 y 3:
+ 591+ 9C1C
+ 592+ 9C1C 2A FC 8B     	ld hl,(Puntero_objeto)
+ 593+ 9C1F 2C           	inc l
+ 594+ 9C20 2C           	inc l
+ 595+ 9C21
+ 596+ 9C21 E5           	push hl
+ 597+ 9C22 FD E1        	pop iy						; (Puntero_objeto) en IY.
+ 598+ 9C24
+ 599+ 9C24 C9           	ret
+ 600+ 9C25
+ 601+ 9C25 CB FC        Dos_Columnas set 7,h
+ 602+ 9C27 CB B4        	res 6,h
+ 603+ 9C29
+ 604+ 9C29 E5           	push hl
+ 605+ 9C2A DD E1        	pop ix						; (Puntero_de_impresion) codificado en IX.
+ 606+ 9C2C
+ 607+ 9C2C 3A 09 8C     	ld a,(Cuad_objeto)
+ 608+ 9C2F E6 01        	and 1
+ 609+ 9C31 C8           	ret z
+ 610+ 9C32
+ 611+ 9C32              ;	Cuadrantes 1 y 3:
+ 612+ 9C32
+ 613+ 9C32 3A F9 8B     	ld a,(Columns)
+ 614+ 9C35 E6 01        	and 1
+ 615+ 9C37 C8           	ret z
+ 616+ 9C38
+ 617+ 9C38 2A FC 8B     	ld hl,(Puntero_objeto)
+ 618+ 9C3B 2C           	inc l
+ 619+ 9C3C
+ 620+ 9C3C E5           	push hl
+ 621+ 9C3D FD E1        	pop iy						; (Puntero_objeto) en IY.
+ 622+ 9C3F
+ 623+ 9C3F C9           	ret
+ 624+ 9C40
+ 625+ 9C40              ; --------------------------------------------------------------------------------------------------------------------
+ 626+ 9C40              ;
+ 627+ 9C40              ;	2/1/23
+ 628+ 9C40              ;
+ 629+ 9C40              ;	Sub-rutina de [Calcula_puntero_de_impresion].
+ 630+ 9C40              ;
+ 631+ 9C40              ;	Tras esta rutina tenemos:
+ 632+ 9C40              ;
+ 633+ 9C40              ;	OUTPUT: HL contiene (Posicion_actual).
+ 634+ 9C40              ;			B contiene (Columnas)-1. Nota: Este valor `nunca' será "0". El valor mínimo es "1".
+ 635+ 9C40              ;
+ 636+ 9C40              ;	DESTRUYE!!!!! HL,B y A.
+ 637+ 9C40
+ 638+ 9C40 2A FA 8B     Operandos ld hl,(Posicion_actual)
+ 639+ 9C43 3A 0A 8C     	ld a,(Columnas)
+ 640+ 9C46 3D           	dec a
+ 641+ 9C47 20 01        	jr nz,1F
+ 642+ 9C49 3C           	inc a
+ 643+ 9C4A 47           1 ld b,a
+ 644+ 9C4B C9           	ret
+ 645+ 9C4C
+ 646+ 9C4C              ; --------------------------------------------------------------------------------------------------------------------
+ 647+ 9C4C              ;
+ 648+ 9C4C              ;	Prepara_draw
+ 649+ 9C4C              ;
+ 650+ 9C4C              ;	Es una rutina de carga.
+ 651+ 9C4C              ;	Carga los registros BC,HL y E para posteriormente llamar a la rutina de pintado [DRAW].
+ 652+ 9C4C              ;
+ 653+ 9C4C              ;	FUNCIONAMIENTO:
+ 654+ 9C4C              ;
+ 655+ 9C4C              ;	- LD (Filas/Columns) del objeto a pintar en [BC].
+ 656+ 9C4C              ;	- LD (Posicion_actual) del objeto en [HL].
+ 657+ 9C4C              ;	- LD E,0. (Dígito de control utilizado por Draw para cálculos internos de la rutina. Ha de estar a "0").
+ 658+ 9C4C              ;
+ 659+ 9C4C              ;	DESTRUYE:
+ 660+ 9C4C              ;
+ 661+ 9C4C              ;	Logicamente, BC,HL y E quedan destruidos.
+ 662+ 9C4C
+ 663+ 9C4C 21 F8 8B     Prepara_draw ld hl,Filas 		 					 					 ; Prepara los registros BC, E y HL.
+ 664+ 9C4F 46           	ld b,(hl) 														     ; Carga Filas/Columns del objeto a pintar o inicializar en BC.
+ 665+ 9C50 23           	inc hl 												 				 ; Carga (Posicion_actual) en HL.
+ 666+ 9C51 4E           	ld c,(hl)
+ 667+ 9C52 2A FA 8B     	ld hl,(Posicion_actual)
+ 668+ 9C55 1E 00        	ld e,0 																 ; Byte de control. Ha de estar a "0" cuando llamamos a [DRAW].
+ 669+ 9C57 C9           	ret
+ 670+ 9C58
+ 671+ 9C58              ;----------------------------------------------------------------------------------------------------------------
+ 672+ 9C58              ;
+ 673+ 9C58              ;	5/08/22
+ 674+ 9C58              ;
+ 675+ 9C58              ;   NextScan.
+ 676+ 9C58              ;
+ 677+ 9C58              ;   Calcula la dirección de mem. de pantalla donde se sitúa el siguiente scanline. (Inc H, línea abajo).
+ 678+ 9C58              ;
+ 679+ 9C58              ;   INPUT: HL contendra la dirección de mem. de video sobre la que queremos calcular el siguiente scanline.
+ 680+ 9C58              ;
+ 681+ 9C58              ;   OUTPUT: HL contendrá la nueva dirección de memoria de pantalla.
+ 682+ 9C58              ;
+ 683+ 9C58              ;       DESTRUIDOS: AF y HL !!!
+ 684+ 9C58              ;
+ 685+ 9C58              ;   010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
+ 686+ 9C58              ;
+ 687+ 9C58
+ 688+ 9C58 24           NextScan inc h          ; Incrementamos el scanline.
+ 689+ 9C59 7C               ld a,h
+ 690+ 9C5A E6 07            and 7
+ 691+ 9C5C C0               ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
+ 692+ 9C5D
+ 693+ 9C5D 7D           	ld a,l              ; Scanlines a "0", cambiamos de tercio. (Siempre que estemos en la última línea, LLL).
+ 694+ 9C5E C6 20            add a,$20           ; Vamos a comprobarlo...
+ 695+ 9C60 6F               ld l,a
+ 696+ 9C61 D8               ret c               ; Salimos si se produce el cambio de tercio.
+ 697+ 9C62
+ 698+ 9C62 7C               ld a,h              ; No estamos en la última línea del tercio, por lo que inicializamos H restando una_
+ 699+ 9C63 D6 08            sub 8               ; _unidad a los bits que definen el tercio TT, (sub $08).
+ 700+ 9C65 67               ld h,a
+ 701+ 9C66 C9               ret
+ 702+ 9C67
+ 703+ 9C67              ;----------------------------------------------------------------------------------------------------------------
+ 704+ 9C67              ;
+ 705+ 9C67              ;	5/08/22
+ 706+ 9C67              ;
+ 707+ 9C67              ;   PreviousScan.
+ 708+ 9C67              ;
+ 709+ 9C67              ;   Calcula la dirección de mem. de pantalla donde se sitúa el scanline anterior. (Dec H, línea arriba).
+ 710+ 9C67              ;
+ 711+ 9C67              ;   INPUT: HL contendra la dirección de mem. de video sobre la que queremos calcular el scanline anterior.
+ 712+ 9C67              ;
+ 713+ 9C67              ;   OUTPUT: HL contendrá la nueva dirección de memoria de pantalla.
+ 714+ 9C67              ;
+ 715+ 9C67              ;       DESTRUIDOS: AF y HL !!!
+ 716+ 9C67              ;
+ 717+ 9C67              ;   010T TSSS LLLC CCCC (Codificación de la memoria de pantalla). $4000 - $57FF, (256 x 192 pixeles).
+ 718+ 9C67              ;
+ 719+ 9C67
+ 720+ 9C67 7C           PreviousScan ld a,h
+ 721+ 9C68 25               dec h               ; Dec H.
+ 722+ 9C69 E6 07            and 7
+ 723+ 9C6B C0               ret nz              ; Salimos de la rutina si el scanline se encuentra entre (1-7).
+ 724+ 9C6C
+ 725+ 9C6C 7D               ld a,l              ; Estabamos en el scanline "0" y al decrementar nos situamos en el "7" y cambiamos de tercio.
+ 726+ 9C6D D6 20            sub $20             ; Vamos a comprobarlo...
+ 727+ 9C6F 6F               ld l,a
+ 728+ 9C70 D8               ret c               ; Salimos si estábamos en la primera línea y se produce el cambio de tercio.
+ 729+ 9C71
+ 730+ 9C71 7C               ld a,h              ; No estamos en la primera línea del tercio, por lo que inicializamos H sumando una_
+ 731+ 9C72 C6 08            add a,8             ; _unidad a los bits que definen el tercio TT, (add a,$08).
+ 732+ 9C74 67               ld h,a
+ 733+ 9C75 C9               ret
+ 734+ 9C76
  735+ 9C76
  736+ 9C76
  737+ 9C76
@@ -5908,7 +5908,6 @@
  743+ 9C76
  744+ 9C76
  745+ 9C76
- 746+ 9C76
 # file closed: Draw_XOR.asm
 2359  9C76              	include "Direcciones.asm"
 # file opened: Direcciones.asm
