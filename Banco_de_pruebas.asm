@@ -1464,9 +1464,7 @@ Construye_movimientos_masticados_entidad
 
 1 call Draw
 
-	jr $
-
-	call Genera_Columnas
+;	jr $
 
 ; -----------------------------------------------------------
 
@@ -1480,8 +1478,6 @@ Construye_movimientos_masticados_entidad
 ;	(Columns) $8bf9
 ;	(Cuad_objeto) $8c09
 
-
-	call Codifica_movimiento
 	call Guarda_movimiento_masticado
 
 	call Movimiento
@@ -1550,96 +1546,6 @@ Actualiza_Puntero_de_almacen_de_mov_masticados
 	and a
 	adc hl,bc
 	ld (Puntero_de_almacen_de_mov_masticados),hl
-	ret
-
-; ------------------------------------------------------------
-;
-;	22/01/25
-;
-
-Genera_Columnas 
-
-	ld a,3
-	ld (Columnas),a
-
-	ld hl,(Posicion_actual)
-	ld a,l
-	and $1F
-	jr nz,1F
-
-; Nos encontramos en la columna "0". Objeto apareciendo por la izquierda.
-; 1 Columna.
-
-	inc a
-	ld (Columnas),a
-	ret
-
-1 dec a
-	jr nz,2F
-
-; Nos encontramos en la columna "1". Objeto apareciendo por la izquierda.
-; 2 Columnas.
-
-	inc a
-	inc a
-	ld (Columnas),a
-	ret
-	
-2 inc a
-
-	cp $1e
-	ret c
-
-; Nos encontramos en la última o penúltima columna de pantalla, "2" o "1" Columnas.
-
-	ld a,2
-	ld (Columnas),a
-	ret z
-
-	ld hl,Columnas
-	dec (hl)	
-
-	ret
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	17/01/25
-;
-;	IX ..... (Puntero_de_impresion).
-;	IY ..... (Puntero_objeto).
-
-Codifica_movimiento
-
-	ld a,(Columnas)
-	dec a
-	jr z,Una_Columna
-	dec a
-	jr z,Dos_Columnas
-	ret
-
-Una_Columna ld a,ixh
-	set 5,a
-	res 6,a
-	ld ixh,a
-
-	ld a,(Coordenada_X)
-	and a
-	ret nz
-
-	inc iyl
-	inc iyl
-	ret
-
-Dos_Columnas ld a,ixh
-	set 7,a
-	res 6,a
-	ld ixh,a
-
-	ld a,(Coordenada_X)	
-	and a
-	ret nz
-
-	inc iyl
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------------------------

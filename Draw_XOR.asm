@@ -430,51 +430,58 @@ column ld a,l
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
-; Esta subrutina se encarga de asignar valor a la variable (Columnas), (nº de columnas del objeto que podemos pintar).
+; 	Calcula (Columnas), Nº de columnas de la entidad que podemos pintar.
 ;
-; 14/12/22
+;	22/1/25
 ;
-;	Modifica: A y BC.
+;	INPUTS: BC contiene (Filas)/(Columns) respectivamente.
+;			A´cintiene (Cuad_objeto).
+;
+;	MODIFY: A y BC, (Columnas).
+;
+calcula_CColumnass 
 
-calcula_CColumnass ld a,(Cuad_objeto)
+	ld a,(Cuad_objeto)
 	and 1
 	jr z,1F
 
-; Nos encontramos en la parte izquierda de la pantalla
+; 	LEFT SIDE !!!!!!!
 
 	ld a,(Coordenada_X)
 	ld b,a
 	inc b											; (Coordenada_X)+1 en B.
-	ld a,c
+
+	ld a,c											; (Columns) en C.	
 	sub b											; (Columns)-[(Coordenada_X)+1] en A.
 	jr c,2F
+
 	ld b,a
 	ld a,c
 	sub b
 	ld (Columnas),a
-	jr 4F
-2 ld a,c
-	ld (Columnas),a
-	jr 4F
+	ret
 
-; Nos encontramos en la parte derecha de la pantalla.
+2 ld a,c											; (Columnas)=(Columns). El objeto entra perfectamente.
+	ld (Columnas),a
+	ret
+
+;	RIGHT SIDE !!!!!!!
 
 1 ld a,(Coordenada_X)
 	add c
 	dec a
 	sub $1f
 	jr c,3F
+
 	ld b,a
 	ld a,c
 	sub b
 	ld (Columnas),a
-	jr 4F
-3 ld a,c
+	ret
+
+3 ld a,c											; (Columnas)=(Columns). El objeto entra perfectamente.
 	ld (Columnas),a
-4 exx
-	ld c,a
-	exx
- ret	
+	ret	
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
@@ -488,10 +495,19 @@ calcula_CColumnass ld a,(Cuad_objeto)
 ;
 ;	DESTRUYE: HL,B Y A.	
 
-Calcula_puntero_de_impresion ld a,(Cuad_objeto)
+Calcula_puntero_de_impresion 
+
+
+	jr $
+
+	; $4721 2 Columnas
+
+	ld a,(Cuad_objeto)
 	cp 2
+
 	jr c,1F
-	jr z,1F
+	jr z,1F							; Cuadrantes 1 y 2 a 1F.
+
 	and 1
 	jr z,3F
 
@@ -501,15 +517,20 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 
 9 ld a,l
 	and $1f
-	jr z,7F
+	call z, Codifica_Puntero_de_impresion
+	ret
+
 	dec hl
 	djnz 9B
-	jr 7F
+
+	call Codifica_Puntero_de_impresion
+	ret
 
 ; Estamos situados en el 4º cuadrante de pantalla. ----- ----- -----
 
 3 ld hl,(Posicion_actual) 
-	jr 7F
+	call Codifica_Puntero_de_impresion
+	ret
 
 1 jr z,2F
 
@@ -525,7 +546,9 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 6 ld b,15
 5 call PreviousScan
 	djnz 5B
-	jr 7F
+	
+	call Codifica_Puntero_de_impresion
+	ret
 
 ; Estamos situados en el 2º cuadrante de pantalla. ----- ----- -----
 
@@ -534,12 +557,65 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 8 call PreviousScan
 	djnz 8B
 
-7 push hl
-	pop ix
+	call Codifica_Puntero_de_impresion
+	ret
+
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	17/01/25
+;
+;	HL ..... (Puntero_de_impresion).
+;	IY ..... (Puntero_objeto).
+
+Codifica_Puntero_de_impresion
+
+	ld a,(Columnas)
+	dec a
+	jr z,Una_Columna
+	dec a
+	jr z,Dos_Columnas
+	ret
+
+Una_Columna set 5,h				; X01X
+	res 6,h
+
+	push hl
+	pop ix						; (Puntero_de_impresion) codificado en IX.
+
+	ld a,(Cuad_objeto)
+	and 1
+	ret z
+
+;	Cuadrantes 1 y 3:
 
 	ld hl,(Puntero_objeto)
+	inc l
+	inc l
+	
 	push hl
-	pop iy
+	pop iy						; (Puntero_objeto) en IY.
+
+	ret
+
+Dos_Columnas set 7,h
+	res 6,h
+
+	push hl
+	pop ix						; (Puntero_de_impresion) codificado en IX.
+
+	ld a,(Cuad_objeto)
+	and 1
+	ret z
+
+;	Cuadrantes 1 y 3:
+
+	ld hl,(Puntero_objeto)
+	inc l
+
+	push hl
+	pop iy						; (Puntero_objeto) en IY.
 
 	ret
 
