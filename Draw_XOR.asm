@@ -611,6 +611,10 @@ Dos_Columnas set 7,h
 
 ;	Cuadrantes 1 y 3:
 
+	ld a,(Columns)
+	and 1
+	ret z
+
 	ld hl,(Puntero_objeto)
 	inc l
 
