@@ -538,7 +538,6 @@ INICIALIZACION
 	call Genera_movimientos_masticados_del_nivel		 ; Generamos las distintas coreografías de la entidades que componen el nivel. También se inicializan las cajas "Master" para ir_
 ;														   _reponiendo entidades eliminadas.
 	call Prepara_Cajas_de_Entidades
-
 	call Inicia_Amadeus
 ;														 ; La rutina [Genera_datos_de_impresion] habilita las interrupciones antes del RET. 
 ;														 ; DI nos asegura que no vamos a ejecutar FRAME hasta que no tengamos todas las entidades iniciadas.
@@ -599,10 +598,6 @@ Main
 ;	di
 ;	jr z,$
 ;	ei
-
-
-
-
 
 ; Gestión de disparos.
 
@@ -1464,8 +1459,6 @@ Construye_movimientos_masticados_entidad
 
 1 call Draw
 
-;	jr $
-
 ; -----------------------------------------------------------
 
 ;	CTRL_DESPLZ $8bfe
@@ -1480,9 +1473,11 @@ Construye_movimientos_masticados_entidad
 
 	call Guarda_movimiento_masticado
 
+	jr $
+
 	call Movimiento
 
-	ld a,(Ctrl_3)												; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
+	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
 	bit 1,a 												; _ que corresponde a esta entidad.
 	jr z,1B
 

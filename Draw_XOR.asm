@@ -497,10 +497,6 @@ calcula_CColumnass
 
 Calcula_puntero_de_impresion 
 
-	jr $
-
-	; $4722 2 Columns
-
 	ld a,(Cuad_objeto)
 	cp 2
 
@@ -516,13 +512,11 @@ Calcula_puntero_de_impresion
 
 9 ld a,l
 	and $1f
-	call z, Codifica_Puntero_de_impresion
-	ret
-
+	jr z,10F
 	dec hl
 	djnz 9B
 
-	call Codifica_Puntero_de_impresion
+10 call Codifica_Puntero_de_impresion
 	ret
 
 ; Estamos situados en el 4º cuadrante de pantalla. ----- ----- -----

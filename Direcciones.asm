@@ -231,7 +231,7 @@ Mov_right ld a,(Ctrl_0)
 
 3 call Reaparece_izquierda 											; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
 ;	call Reinicio
-	call Draw
+;	call Draw
 
 ; ---------- ---------- ----------
 ;
