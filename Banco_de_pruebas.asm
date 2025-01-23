@@ -1473,7 +1473,7 @@ Construye_movimientos_masticados_entidad
 
 	call Guarda_movimiento_masticado
 
-	jr $
+;	jr $
 
 	call Movimiento
 
@@ -1500,6 +1500,72 @@ Construye_movimientos_masticados_entidad
 	ld (hl),c
 	inc hl
 	ld (hl),b
+
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
+;	17/01/25
+;
+;	INPUTS: HL contiene (Puntero_de_impresion).
+
+Codifica_Puntero_de_impresion
+
+	ld a,(Columnas)
+	dec a
+	jr z,Una_Columna
+	dec a
+	jr z,Dos_Columnas
+	ret
+
+Una_Columna 					
+
+	set 5,h				
+	res 6,h
+
+	push hl
+	pop ix						; (Puntero_de_impresion) codificado en IX.
+
+	call Ajusta_Puntero_objeto
+
+	ret
+
+Dos_Columnas 
+
+	set 7,h
+	res 6,h
+
+	push hl
+	pop ix						; (Puntero_de_impresion) codificado en IX.
+
+	call Ajusta_Puntero_objeto
+
+	ret
+
+; ----- ----- ----- ----- -----
+
+Ajusta_Puntero_objeto ld a,(Cuad_objeto)
+	and 1
+	ret z 						; No modificamos (Puntero-objeto) si estamos en los cuadrantes 2 y 4.
+
+	ld hl,(Puntero_objeto)
+
+;	Cuadrantes 1 y 3:
+
+	ld a,(Columnas)
+	ld b,a
+
+	ld a,(Columns)
+	sub b
+	
+	jr z,2F
+
+	ld b,a
+1 inc l
+	djnz 1B	
+
+2 push hl
+	pop iy						; (Puntero_objeto) en IY.
 
 	ret
 

@@ -495,14 +495,10 @@ calcula_CColumnass
 ;
 ;	DESTRUYE: HL,B Y A.	
 
-Calcula_puntero_de_impresion 
-
-	ld a,(Cuad_objeto)
+Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 	cp 2
-
 	jr c,1F
-	jr z,1F							; Cuadrantes 1 y 2 a 1F.
-
+	jr z,1F
 	and 1
 	jr z,3F
 
@@ -512,18 +508,15 @@ Calcula_puntero_de_impresion
 
 9 ld a,l
 	and $1f
-	jr z,10F
+	jr z,7F
 	dec hl
 	djnz 9B
-
-10 call Codifica_Puntero_de_impresion
-	ret
+	jr 7F
 
 ; Estamos situados en el 4º cuadrante de pantalla. ----- ----- -----
 
 3 ld hl,(Posicion_actual) 
-	call Codifica_Puntero_de_impresion
-	ret
+	jr 7F
 
 1 jr z,2F
 
@@ -539,9 +532,7 @@ Calcula_puntero_de_impresion
 6 ld b,15
 5 call PreviousScan
 	djnz 5B
-	
-	call Codifica_Puntero_de_impresion
-	ret
+	jr 7F
 
 ; Estamos situados en el 2º cuadrante de pantalla. ----- ----- -----
 
@@ -550,74 +541,12 @@ Calcula_puntero_de_impresion
 8 call PreviousScan
 	djnz 8B
 
-	call Codifica_Puntero_de_impresion
-	ret
-
-	ret
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	17/01/25
-;
-;	INPUTS: HL contiene (Puntero_de_impresion).
-
-Codifica_Puntero_de_impresion
-
-	ld a,(Columnas)
-	dec a
-	jr z,Una_Columna
-	dec a
-	jr z,Dos_Columnas
-	ret
-
-Una_Columna 					
-
-	set 5,h				
-	res 6,h
-
-	push hl
-	pop ix						; (Puntero_de_impresion) codificado en IX.
-
-	call Ajusta_Puntero_objeto
-
-	ret
-
-Dos_Columnas 
-
-	set 7,h
-	res 6,h
-
-	push hl
-	pop ix						; (Puntero_de_impresion) codificado en IX.
-
-	call Ajusta_Puntero_objeto
-
-	ret
-
-; ----- ----- ----- ----- -----
-
-Ajusta_Puntero_objeto ld a,(Cuad_objeto)
-	and 1
-	ret z 						; No modificamos (Puntero-objeto) si estamos en los cuadrantes 2 y 4.
+7 push hl
+	pop ix
 
 	ld hl,(Puntero_objeto)
-
-;	Cuadrantes 1 y 3:
-
-	ld a,(Columnas)
-	ld b,a
-
-	ld a,(Columns)
-	sub b
-	
-	jr z,2F
-
-	ld b,a
-1 inc l
-	djnz 1B	
-
-2 push hl
-	pop iy						; (Puntero_objeto) en IY.
+	push hl
+	pop iy
 
 	ret
 
@@ -730,6 +659,17 @@ PreviousScan ld a,h
     add a,8             ; _unidad a los bits que definen el tercio TT, (add a,$08).
     ld h,a
     ret
+
+
+	
+
+
+
+
+
+
+
+
 
 
 	
