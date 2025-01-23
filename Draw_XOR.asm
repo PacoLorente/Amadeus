@@ -497,10 +497,9 @@ calcula_CColumnass
 
 Calcula_puntero_de_impresion 
 
-
 	jr $
 
-	; $4721 2 Columnas
+	; $4722 2 Columns
 
 	ld a,(Cuad_objeto)
 	cp 2
@@ -577,47 +576,53 @@ Codifica_Puntero_de_impresion
 	jr z,Dos_Columnas
 	ret
 
-Una_Columna set 5,h				; X01X
+Una_Columna 					
+
+	set 5,h				
 	res 6,h
 
 	push hl
 	pop ix						; (Puntero_de_impresion) codificado en IX.
 
-	ld a,(Cuad_objeto)
-	and 1
-	ret z
-
-;	Cuadrantes 1 y 3:
-
-	ld hl,(Puntero_objeto)
-	inc l
-	inc l
-	
-	push hl
-	pop iy						; (Puntero_objeto) en IY.
+	call Ajusta_Puntero_objeto
 
 	ret
 
-Dos_Columnas set 7,h
+Dos_Columnas 
+
+	set 7,h
 	res 6,h
 
 	push hl
 	pop ix						; (Puntero_de_impresion) codificado en IX.
 
-	ld a,(Cuad_objeto)
+	call Ajusta_Puntero_objeto
+
+	ret
+
+; ----- ----- ----- ----- -----
+
+Ajusta_Puntero_objeto ld a,(Cuad_objeto)
 	and 1
-	ret z
+	ret z 						; No modificamos (Puntero-objeto) si estamos en los cuadrantes 2 y 4.
+
+	ld hl,(Puntero_objeto)
 
 ;	Cuadrantes 1 y 3:
 
+	ld a,(Columnas)
+	ld b,a
+
 	ld a,(Columns)
-	and 1
-	ret z
+	sub b
+	
+	jr z,2F
 
-	ld hl,(Puntero_objeto)
-	inc l
+	ld b,a
+1 inc l
+	djnz 1B	
 
-	push hl
+2 push hl
 	pop iy						; (Puntero_objeto) en IY.
 
 	ret
