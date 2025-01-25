@@ -1620,6 +1620,41 @@ Dos_Columnas
 
 ; ----- ----- ----- ----- -----
 
+;Decodifica_Puntero_de_impresion bit 6,b
+;	jr nz,1F
+
+;	(Puntero_de_impresión) codificado.
+
+;	bit 7,b
+;	jr z,3F
+
+;	Decodifica 2 Columnas.
+
+;	bit 5,b
+;	jr z,4F
+;	res 7,b
+;	jr 5F
+
+;4 res 7,b
+;	set 6,b
+
+;5 ld a,2
+;	jr 2F
+
+;	Decodifica 1 Columna.	
+
+;3 res 5,b
+;	set 6,b
+;	ld a,1
+;	jr 2F
+
+; 	Almacena (Puntero_de_impresion) en caja.
+
+;1 ld a,3
+;2 ld (Columnas),a
+
+; ------------------------------------------------------------------------------------------------------------------
+
 Ajusta_Puntero_objeto ld a,(Cuad_objeto)
 	and 1
 	ret z 						; No modificamos (Puntero-objeto) si estamos en los cuadrantes 2 y 4.
