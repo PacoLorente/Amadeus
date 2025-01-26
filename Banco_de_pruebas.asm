@@ -1238,6 +1238,12 @@ Entidad_a_Tabla_de_pintado
 	ld (hl),d
 	inc l
 
+	jr $
+
+; El 4º .db de la tabla será (Columnas).
+
+
+
 	ld (India_SP),hl
 
 	ret
@@ -1425,109 +1431,15 @@ Construye_movimientos_masticados_entidad
 	call Recompone_posicion_inicio
 
 1 call Draw
+
+;	IX contiene (Puntero_de_impresion)
+;	IY contiene (Puntero_objeto)
+
+
+	call Codifica_Puntero_de_impresion
 	call Guarda_movimiento_masticado
 
-	jr 2F
-	
-;! Debuggggggg !!!!!!! -----------------------------------------------------------------------------------------------------------
-;! Necesitamos pintar cada movimiento para depurar errores en la entrada y salida de las entidades por la pantalla !!!!!!!!!!!!!!!
-;! -------------------------------------------------------------------------------------------------------------------------------
-;! -------------------------------------------------------------------------------------------------------------------------------
-
-	push af
-	push bc
-	push de
-	push hl
-	push iy
-	push ix
-
-	xor a
-    out ($fe),a			; Paper 7, Ink 0, Border 0
-
-;	8BF2 00           CTRL_DESPLZ
-;	8Be5 00 00        Puntero_de_almacen_de_mov_masticados defw 0	($e0f4)
-;	$ddc0			  Almacén de movimientos masticados.
-;	8BE3 00 00        Puntero_de_impresion defw 0
-;	8Bdf 00           Coordenada_X db 0 										; Coordenada X del objeto. (En chars.)
-;	8Be0 00  	      Coordenada_y db 0 										; Coordenada Y del objeto. (En chars.)
-;	8Bee 00 00        Posicion_actual defw 0									; Dirección actual del Sprite. [DRAW]
-;	8Bf0 00 00		  Puntero_objeto defw 0 									; Donde están los datos para pintar el Sprite.
-
-; -------------------------------------------------------------------------
-
-; 	Pos_actual $43fe - 
-;	Puntero_de_impresion $44be
-;	Puntero_objeto $8540
-;	Ctrl_Desplz $00
-
-;	En función de la Posicion_actual:
-
-;	Coordenada_X $1e	
-;	Coordenada_y $07 	
-
-; -------------------------------------------------------------------------
-
-	ld hl,(Album_de_pintado)
-	ld (Scanlines_album_SP),hl
-
-	push iy 
-	pop de
-
-	push de
-	call Genera_datos_de_impresion
-	pop de
-
-
-;							; Para ejecutar Rutinas_de_pintado necesitamos: 
-;
-;							HL apuntando al álbum de líneas (Scanlines_album_SP)
-;							DE (Puntero objeto).
-
-
-	ld hl,(Album_de_pintado)
-	ex de,hl
-	call Pinta_Sprites
-
-;	ld a,(Coordenada_X)
-;	cp 30
-;	jr z,$
-;	cp 31
-;	jr z,$
-;	cp 0
-;	jr z,$
-;	cp 1
-;	jr z,$
-
-;	jr $
-
-;	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
-	ld a,%00111000
-	call Cls
-
-; Borra album de pintado.
-
-	xor a
-	ld hl,$8000
-	ld b,40
-23 ld (hl),a
-	inc l
-	djnz 23b
-
-; ----- ----- ----- ----- ----- 
-
-	pop ix
-	pop iy
-	pop hl
-	pop de
-	pop bc
-	pop af
-
-;! -------------------------------------------------------------------------------------------------------------------------------
-;! -------------------------------------------------------------------------------------------------------------------------------
-;! -------------------------------------------------------------------------------------------------------------------------------
-;! -------------------------------------------------------------------------------------------------------------------------------
-
-2 call Movimiento
+	call Movimiento
 
 	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
 	bit 1,a 												; _ que corresponde a esta entidad.
@@ -1581,11 +1493,20 @@ Guarda_movimiento_masticado
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
-;	17/01/25
+;	26/01/25
 ;
-;	INPUTS: HL contiene (Puntero_de_impresion).
+;	INPUTS: IX contiene (Puntero_de_impresion)
+;			IY contiene (Puntero_objeto)
 
 Codifica_Puntero_de_impresion
+
+; 	En 1er lugar verificamos si estamos en zona de video, RET si no es así.
+
+	ld a,ixh
+	bit 6,a
+	ret z
+
+;	Codificamos (Puntero_de_impresion) en función del nº de (Columnas) a imprimir.
 
 	ld a,(Columnas)
 	dec a
@@ -1594,89 +1515,44 @@ Codifica_Puntero_de_impresion
 	jr z,Dos_Columnas
 	ret
 
-Una_Columna 					
-
-	set 5,h				
-	res 6,h
-
-	push hl
-	pop ix						; (Puntero_de_impresion) codificado en IX.
-
-	call Ajusta_Puntero_objeto
-
-	ret
-
 Dos_Columnas 
 
-	set 7,h
-	res 6,h
+	ld a,ixh
+	set 7,a
+	ld ixh,a
 
-	push hl
-	pop ix						; (Puntero_de_impresion) codificado en IX.
+;	Si nos encontramos en el lado derecho de la pantalla no modificamos (Puntero_objeto).	
+
+1 ld a,(Cuad_objeto)
+	and 1
+	ret z
 
 	call Ajusta_Puntero_objeto
 
 	ret
+
+Una_Columna 					
+
+	ld a,ixh
+	set 5,a
+	ld ixh,a
+
+	jr 1B
 
 ; ----- ----- ----- ----- -----
 
-;Decodifica_Puntero_de_impresion bit 6,b
-;	jr nz,1F
-
-;	(Puntero_de_impresión) codificado.
-
-;	bit 7,b
-;	jr z,3F
-
-;	Decodifica 2 Columnas.
-
-;	bit 5,b
-;	jr z,4F
-;	res 7,b
-;	jr 5F
-
-;4 res 7,b
-;	set 6,b
-
-;5 ld a,2
-;	jr 2F
-
-;	Decodifica 1 Columna.	
-
-;3 res 5,b
-;	set 6,b
-;	ld a,1
-;	jr 2F
-
-; 	Almacena (Puntero_de_impresion) en caja.
-
-;1 ld a,3
-;2 ld (Columnas),a
-
-; ------------------------------------------------------------------------------------------------------------------
-
-Ajusta_Puntero_objeto ld a,(Cuad_objeto)
-	and 1
-	ret z 						; No modificamos (Puntero-objeto) si estamos en los cuadrantes 2 y 4.
-
-	ld hl,(Puntero_objeto)
-
-;	Cuadrantes 1 y 3:
+Ajusta_Puntero_objeto 
 
 	ld a,(Columnas)
 	ld b,a
 
 	ld a,(Columns)
 	sub b
+	ret z 						; No modificamos (Puntero_objeto). Se imprime completo en pantalla.
 	
-	jr z,2F
-
 	ld b,a
-1 inc l
+1 inc iyl
 	djnz 1B	
-
-2 push hl
-	pop iy						; (Puntero_objeto) en IY.
 
 	ret
 
@@ -1717,11 +1593,47 @@ Obtenemos_puntero_de_impresion
 	ld l,h															; ld hl,"0"
 
 	pop de															; (Puntero_objeto) en DE.
-	pop bc	
+	pop bc															; (Puntero_de_impresion) codificado en BC.
+
+; Decodificamos (Puntero_de_impresion) para almacenarlo correctamente.
+
+; ----- ----- ----- ----- -----
+
+Decodifica_Puntero_de_impresion 
+
+	ld a,2
+	ld (Columnas),a
+
+	bit 6,b
+	jr z,1F 															; Entidad en ROM.
+
+	inc a
+	ld (Columnas),a
+
+;	(Puntero_de_impresión) codificado.
+
+	bit 7,b
+	jr z,2F
+
+;	Decodifica 2 Columnas.
+
+	res 7,b
+	ld a,2
+	ld (Columnas),a
+	jr 1F
+
+;	Decodifica 1 Columna.	
+
+2 bit 5,b
+	jr z,1F
+
+	res 5,b
+	ld a,1
+	ld (Columnas),a
 
 ; 	Almacena (Puntero_de_impresion) en caja.
 
-	ld (ix+5),c
+1 ld (ix+5),c
 	ld (ix+6),b
 
 	ld (Puntero_de_impresion),bc
@@ -2124,6 +2036,9 @@ Borrando_Amadeus
 	ld hl,Ctrl_3
 	bit 5,(hl)
 	jr z,1F												; No borramos. No ha habido movimiento.
+
+	ld a,3
+	ld (Columnas),a
 
 	ld hl,(Album_de_borrado_Amadeus)
 	call Extrae_address
