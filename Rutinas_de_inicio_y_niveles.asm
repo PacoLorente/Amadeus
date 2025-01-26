@@ -189,7 +189,6 @@ Prepara_Cajas_de_Entidades
 	call Obtenemos_puntero_de_impresion
 
 	ld l,(ix+5)
-	inc l
 	ld h,(ix+6)													; (Puntero_de_impresion) en HL.
 
 	push de														; Push (Puntero_objeto). 
@@ -202,7 +201,15 @@ Prepara_Cajas_de_Entidades
 	ld (ix+1),c
 	ld (ix+2),b													; (Coordenada_X) y (Coordenada_Y) en caja de entidad.
 
+ ;	2ª Función de (Puntero_indice_mov) y los punteros de desplazamientos. Ahora se encargarán de almacenar las columnas de las entidades a borrar.
+
+; 	----- ----- ----- ----- -----
+
+	ld hl,Indice_Sprite_der+1
+	ld (Puntero_indice_mov),hl
 	call Entidad_a_Tabla_de_pintado								; Almacena la (Coordenada_Y) y dirección dentro de (Scanlines_album_SP) de la entidad en curso.
+
+; 	----- ----- ----- ----- -----
 
 	pop ix														; Pop (Puntero_de_impresion) en IX.
 	pop de														; Pop (Puntero_objeto) en DE.

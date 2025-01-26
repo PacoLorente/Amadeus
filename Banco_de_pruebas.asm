@@ -586,6 +586,10 @@ Main
 ;
 ; 07/11/24.
 
+	di
+	jr $
+	ei
+
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
@@ -1238,13 +1242,20 @@ Entidad_a_Tabla_de_pintado
 	ld (hl),d
 	inc l
 
-	jr $
-
 ; El 4º .db de la tabla será (Columnas).
 
-
-
+	ld a,(Columnas)
+	ld (hl),a
+	inc l
 	ld (India_SP),hl
+
+
+; (Columnas) también se almacenan en las "Columnas de borrado".	
+
+	ld hl,(Puntero_indice_mov)
+	ld (hl),a
+	inc l
+	ld (Puntero_indice_mov),hl
 
 	ret
 
@@ -1428,13 +1439,12 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-	call Recompone_posicion_inicio
+;	call Recompone_posicion_inicio
 
 1 call Draw
 
 ;	IX contiene (Puntero_de_impresion)
 ;	IY contiene (Puntero_objeto)
-
 
 	call Codifica_Puntero_de_impresion
 	call Guarda_movimiento_masticado
@@ -1527,6 +1537,13 @@ Dos_Columnas
 	and 1
 	ret z
 
+;	No ajustamos (Puntero_objeto). El objeto ya ha aparecido completamente por la izquierda. (Coordenada_X)="$02".
+;	Imprimimos la entidad completa, (Columnas)=2 o 3.
+
+	ld a,ixl
+	and $1f
+	ret nz				
+
 	call Ajusta_Puntero_objeto
 
 	ret
@@ -1545,12 +1562,10 @@ Ajusta_Puntero_objeto
 
 	ld a,(Columnas)
 	ld b,a
-
-	ld a,(Columns)
-	sub b
-	ret z 						; No modificamos (Puntero_objeto). Se imprime completo en pantalla.
-	
+	ld a,3
+	sub b	
 	ld b,a
+
 1 inc iyl
 	djnz 1B	
 
@@ -1982,7 +1997,7 @@ Limpia_caja_de_entidades
 
 ; ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------
 ;
-;	4/6/24
+;	26/01/25
 ;
 ;	Es la 1ª rutina que se ejcuta tras la rutina de interrupciones.
 ; 	
@@ -2005,6 +2020,11 @@ Borrando_entidades
 	inc h
 	dec h
 	jr z,Pintando_entidades
+
+;	No hay nada que pintar.
+
+	jr $
+
 	call Pinta_Sprites
 	jr Borrando_entidades
 	
@@ -2016,11 +2036,21 @@ Pintando_entidades
 	inc h
 	dec h
 	jr z,Ejecuta_escudo
+
+;	Adquiere (Columnas).
+
 	inc e
+	inc e
+
+	ld a,(de)
+	ld (Columnas),a
+
 	inc e
 	ld (India_SP),de
+
 	call Extrae_address
 	call Pinta_Sprites
+
 	jr Pintando_entidades
 
 ; --------------------- ----------------------- ---------------------- ---------------------- ---------------
