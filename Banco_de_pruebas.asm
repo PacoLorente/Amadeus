@@ -586,10 +586,6 @@ Main
 ;
 ; 07/11/24.
 
-	di
-	jr $
-	ei
-
 ; Gestión de disparos.
 
 	call Change_Disparos								; Intercambiamos los álbumes de disparos.
@@ -733,9 +729,12 @@ Main
 
 ; -------------------------------------------
 
-3 call Entidad_a_Tabla_de_pintado								; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
+3 call Obtenemos_puntero_de_impresion							; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.			ok.
+
+	push de
+	call Entidad_a_Tabla_de_pintado								; Almacena la Coordenada_Y y (Scanlines_album_SP) de la entidad en curso en la TABLA_DE_PINTADO.
 	call Ajusta_velocidad_entidad								; Ajusta el perfil de velocidad de la entidad en función de (Contader_de_vueltas).
-	call Obtenemos_puntero_de_impresion							; Cargamos los registros con el movimiento actual y `saltamos' al movimiento siguiente.			ok.
+	pop de
 
 	push ix														; Push .db (Tipo) de la entidad, (caja de entidades correspondiente).
 	ld ix,(Puntero_de_impresion)
@@ -1249,14 +1248,6 @@ Entidad_a_Tabla_de_pintado
 	inc l
 	ld (India_SP),hl
 
-
-; (Columnas) también se almacenan en las "Columnas de borrado".	
-
-	ld hl,(Puntero_indice_mov)
-	ld (hl),a
-	inc l
-	ld (Puntero_indice_mov),hl
-
 	ret
 
 ; --------------------------------------------------------------------------------------------------------------
@@ -1267,20 +1258,20 @@ Entidad_a_Tabla_de_pintado
 Inicializa_India_y_limpia_Tabla_de_impresion 
 
 	ld hl,(India_SP)
-	ld bc,Tabla_de_pintado+24							; Bytes de (Tabla_de_pintado)-1.
+	ld bc,Indice_de_almacenes_de_mov_masticados-1							; Bytes de (Tabla_de_pintado)-1.
 
 	ld a,c
 	sub l
 	jr z,2F
-	ld b,a												; Nº de bytes a limpiar de la tabla. Si la Tabla está completa, omitimos limpiar_
-;														; _ y pasamos a inicializar (India_SP).
+	ld b,a																	; Nº de bytes a limpiar de la tabla. Si la Tabla está completa, omitimos limpiar_
+;																			; _ y pasamos a inicializar (India_SP).
 	xor a
 
 1 ld (hl),a
 	inc l
-	djnz 1B												; Limpia Tabla.
+	djnz 1B																	; Limpia Tabla.
 
-2 ld hl,Tabla_de_pintado								; Inicializa (India_SP).
+2 ld hl,Tabla_de_pintado													; Inicializa (India_SP).
 	ld (India_SP),hl
 
 	ret
@@ -1311,7 +1302,7 @@ Ordena_tabla_de_impresion
 
 	ld a,(hl)									; Nº de Fila de la 1ª entidad, (1er byte de la tabla).
 
-	ld hl,Tabla_de_pintado+3
+	ld hl,Tabla_de_pintado+4
 	ld b,(hl)
 	ld (India_2_SP),hl
 
@@ -1377,6 +1368,7 @@ Avanza_India_2_SP
 	inc l
 	inc l
 	inc l
+	inc l
 
 	ld b,(hl)
 	ld (India_2_SP),hl 							; Siguiente entidad en la Tabla.
@@ -1393,15 +1385,20 @@ Avanza_punteros_indios
 	ld c,d
 
 	ld hl,(India_SP)
+
 	inc l
 	inc l
 	inc l
+	inc l
+
 	ld a,(hl)
 	ld (India_SP),hl
 
 	inc l
 	inc l
 	inc l
+	inc l
+
 	ld b,(hl)
 	ld (India_2_SP),hl
 
@@ -1439,7 +1436,7 @@ Construye_movimientos_masticados_entidad
 ;															; _ el (Contador_de_mov_masticados).    
 	call Inicia_Puntero_objeto								; Inicializa (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq).
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
-;	call Recompone_posicion_inicio
+	call Recompone_posicion_inicio
 
 1 call Draw
 
@@ -2013,6 +2010,11 @@ Actualiza_pantalla
 	bit 2,a
 	jr z,Ejecuta_escudo                                             ; No hay movimiento de entidades. Saltamos a Amadeus.
 
+;	Inicializamos el (Puntero_de_columnas) para el borrado, (Puntero_indice_mov).
+
+	ld bc,Indice_Sprite_der+1
+	ld (Puntero_indice_mov),bc
+
 Borrando_entidades
 
 	ld hl,(Scanlines_album_SP)
@@ -2021,14 +2023,26 @@ Borrando_entidades
 	dec h
 	jr z,Pintando_entidades
 
-;	No hay nada que pintar.
+;	Borramos entidades, pero antes... indicamos (Columnas).
 
-	jr $
+	ld bc,(Puntero_indice_mov)
+	ld a,(bc)
+	ld (Columnas),a
+
+	xor a
+	ld (bc),a
+	inc c
+	ld (Puntero_indice_mov),bc
 
 	call Pinta_Sprites
 	jr Borrando_entidades
 	
 Pintando_entidades
+
+;	Inicializamos el (Puntero_de_columnas) para el borrado, (Puntero_indice_mov).
+
+	ld bc,Indice_Sprite_der+1
+	ld (Puntero_indice_mov),bc
 
 	ld hl,(India_SP)
 	inc l
@@ -2044,6 +2058,11 @@ Pintando_entidades
 
 	ld a,(de)
 	ld (Columnas),a
+
+	ld bc,(Puntero_indice_mov)
+	ld (bc),a
+	inc c
+	ld (Puntero_indice_mov),bc
 
 	inc e
 	ld (India_SP),de
