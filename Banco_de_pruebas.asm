@@ -274,6 +274,9 @@ Puntero_DESPLZ_izq defw 0
 Posicion_inicio defw 0									; Dirección de pantalla donde aparece el objeto. [DRAW].
 Cuad_objeto db 0										; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
 Columnas db 0
+
+Columnitas db 0
+
 Limite_horizontal defw 0 								; Dirección de pantalla, (scanline), calculado en función del tamaño del Sprite. Si el objeto llega a esta línea se modifica_    
 ; 														; _(Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
 Limite_vertical db 0 									; Nº de columna. Si el objeto llega a esta columna se modifica (Posicion_actual) para poder asignar un nuevo (Cuad_objeto).
@@ -513,8 +516,8 @@ START
 
 ; Limpiamos pantalla.
 
-	ld a,%00000111
-	call Cls
+;	ld a,%00000111
+;	call Cls
 	call Pulsa_ENTER									 ; PULSA ENTER para disparar el programa.
 
 INICIALIZACION
@@ -583,12 +586,13 @@ INICIALIZACION
 ; ------------------------------------
 
 Main 
+
 ;
 ; 07/11/24.
 
 ; Gestión de disparos.
 
-	call Change_Disparos								; Intercambiamos los álbumes de disparos.
+25 call Change_Disparos								; Intercambiamos los álbumes de disparos.
 	call Motor_de_disparos_entidades
 	call Motor_Disparos_Amadeus							; Mueve y detecta colisión de los disparos de Amadeus.
 
@@ -1443,6 +1447,7 @@ Construye_movimientos_masticados_entidad
 ;	IX contiene (Puntero_de_impresion)
 ;	IY contiene (Puntero_objeto)
 
+	call Calcula_Columnitas
 	call Codifica_Puntero_de_impresion
 	call Guarda_movimiento_masticado
 
@@ -1500,6 +1505,42 @@ Guarda_movimiento_masticado
 
 ; --------------------------------------------------------------------------------------------------------------
 ;
+;	27/01/2025
+;
+;	INPUTS: IX contiene (Puntero_de_impresion)
+;			IY contiene (Puntero_objeto)
+
+Calcula_Columnitas
+
+	ld a,3
+	ld (Columnitas),a
+
+	ld hl,(Posicion_actual)
+	ld a,l
+	and $1f
+	and a
+	jr z,Una_columnita
+	dec a
+	jr z,Dos_columnitas
+	inc a
+
+	cp $1d
+	ret c
+	ret z
+
+	inc a
+	and $1f
+	jr z,Una_columnita
+
+Dos_columnitas ld a,2
+	jr 1F
+Una_columnita ld a,1
+1 ld (Columnitas),a
+
+	ret
+
+; --------------------------------------------------------------------------------------------------------------
+;
 ;	26/01/25
 ;
 ;	INPUTS: IX contiene (Puntero_de_impresion)
@@ -1513,16 +1554,29 @@ Codifica_Puntero_de_impresion
 	bit 6,a
 	ret z
 
-;	Codificamos (Puntero_de_impresion) en función del nº de (Columnas) a imprimir.
+;	Correcciones:
 
-	ld a,(Columnas)
+; 	Posicion_actual $8bfa									
+;	CTRL_DESPLZ $8bfe
+;	Puntero_DESPLZ_der $8c03
+; 	Puntero_DESPLZ_izq $8c05
+;	Puntero_de_almacen_de_mov_masticados $8bf1
+;	Cuad_objeto $8c09		
+;	Columnitas $8c0b
+;	Columns $8bf9
+
+;	Codificamos (Puntero_de_impresion) en función del nº de (Columnitas) a imprimir.
+
+	ld a,(Columnitas)
 	dec a
-	jr z,Una_Columna
+	jr z,Codificamos_una_Columnita
+
 	dec a
-	jr z,Dos_Columnas
+	jr z,Codificamos_dos_Columnitas
+
 	ret
 
-Dos_Columnas 
+Codificamos_dos_Columnitas
 
 	ld a,ixh
 	set 7,a
@@ -1534,18 +1588,11 @@ Dos_Columnas
 	and 1
 	ret z
 
-;	No ajustamos (Puntero_objeto). El objeto ya ha aparecido completamente por la izquierda. (Coordenada_X)="$02".
-;	Imprimimos la entidad completa, (Columnas)=2 o 3.
-
-	ld a,ixl
-	and $1f
-	ret nz				
-
 	call Ajusta_Puntero_objeto
 
 	ret
 
-Una_Columna 					
+Codificamos_una_Columnita				
 
 	ld a,ixh
 	set 5,a
@@ -1557,7 +1604,7 @@ Una_Columna
 
 Ajusta_Puntero_objeto 
 
-	ld a,(Columnas)
+	ld a,(Columnitas)
 	ld b,a
 	ld a,3
 	sub b	
@@ -2027,7 +2074,7 @@ Borrando_entidades
 
 	ld bc,(Puntero_indice_mov)
 	ld a,(bc)
-	ld (Columnas),a
+	ld (Columnitas),a
 
 	xor a
 	ld (bc),a
@@ -2057,7 +2104,7 @@ Pintando_entidades
 	inc e
 
 	ld a,(de)
-	ld (Columnas),a
+	ld (Columnitas),a
 
 	ld bc,(Puntero_indice_mov)
 	ld (bc),a
@@ -2087,7 +2134,7 @@ Borrando_Amadeus
 	jr z,1F												; No borramos. No ha habido movimiento.
 
 	ld a,3
-	ld (Columnas),a
+	ld (Columnitas),a
 
 	ld hl,(Album_de_borrado_Amadeus)
 	call Extrae_address

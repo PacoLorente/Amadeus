@@ -176,23 +176,19 @@ Mov_right ld a,(Ctrl_0)
 
 	call Stop_Amadeus_right											; Estamos moviendo Amadeus???????. Si es así hemos de comprobar que no hemos llegado al char.30 de la línea, [Stop_Amadeus].
 	ret z 															; Salimos de Mov_right si hemos llegado al char.30.
-
-;;	ld hl,Ctrl_0
-;;	set 4,(hl)
 	jr 8F
 
-10 
-;	ld hl,Ctrl_0
-;	set 4,(hl) 														; Indicamos con el Bit4 de (Ctrl_0) que hay movimiento. Vamos a utilizar_
-; 																	; _esta información para evitar que la entidad se vuelva borrar/pintar_
-; 																	; _ en el caso de que no lo haya.
-	ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
+10 ld a,(Coordenada_X)	 	  										; Estamos en el char. 31?								
 	cp 31															; Si no es así, saltamos a [3] para seguir con el desplazamiento progrmado.
 	jr nz,8F
 
 	ld a,(CTRL_DESPLZ) 		 										; Estamos en el último char. de la línea. Si (CTRL_DESPLZ)="0" saltamos a_	 									
 	and a 															; _[3] para continuar con el DESPLZ.
 	jr z,8F 														 														
+
+
+;	jr $
+
 
 ; ---------- ---------- ----------
 ;
@@ -213,15 +209,17 @@ Mov_right ld a,(Ctrl_0)
 
 6 ld a,(CTRL_DESPLZ) 												; Velocidad 1
 	cp $fe 															
-	jr nz,8F
+	jr c,8F
 	jr 3F
+
 1 ld a,(CTRL_DESPLZ) 												; Velocidad 2
 	cp $fd
-	jr nz,8F
+	jr c,8F
 	jr 3F
+
 7 ld a,(CTRL_DESPLZ) 												; Velocidad 4
 	cp $fb
-	jr nz,8F
+	jr c,8F
 
 ; ---------- ---------- ----------
 
@@ -242,6 +240,7 @@ Mov_right ld a,(Ctrl_0)
 	dec hl 															; _ (Posicion_actual) ha pasado de $00 a $01.
 	ld (Posicion_actual),hl
 	call Genera_coordenadas
+
 	jr 2F 															; Salimos para pintar la nueva posición.
 
 ; ---------- ---------- ----------
@@ -344,13 +343,17 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 
 	ld hl,Columns 												  
 	inc (hl)
+
 	ld a,(Cuad_objeto)
 	and 1
 	jr z,1F
+
 	ld hl,(Posicion_actual) 									  ; Incrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _	
 	inc hl 														  ; _ cuadrantes 1 y 3 de pantalla.
 	ld (Posicion_actual),hl
+
 	call Genera_coordenadas
+
 	call Inc_CTRL_DESPLZ
 	jr 2F
 1 call Inc_CTRL_DESPLZ
@@ -384,13 +387,16 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 	add b
 	ld (CTRL_DESPLZ),a 
 	jr 3F
+
 1 ld hl,Columns													 ; Tras 8 desplazamientos el objeto desplazado es igual al original.
 	dec (hl) 													 ; Decrementamos el nº de (Columns).
 	xor a 														 ; Reiniciamos (CTRL_DESPLZ).
 	ld (CTRL_DESPLZ),a 
+
 	ld a,(Cuad_objeto) 											 ; Si estamos situados en el cuadrante 1º o 3º de la pantalla no modificamos_
 	and 1 														 ; _(Posicion_actual). Limpiamos la (Caja_de_DESPLZ) y salimos.
 	jr nz,2F
+
 	ld hl,(Posicion_actual)                                      ; Incrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
 	inc hl
 	ld (Posicion_actual),hl
@@ -700,7 +706,9 @@ Reaparece_derecha ld hl,(Posicion_actual)
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 
-Reaparece_izquierda ld hl,(Posicion_actual)	 					
+Reaparece_izquierda 
+
+	ld hl,(Posicion_actual)	 					
 	ld bc,31 														
 	and a
 	sbc hl,bc
