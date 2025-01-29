@@ -1442,40 +1442,40 @@ Construye_movimientos_masticados_entidad
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
 	call Recompone_posicion_inicio
 
-1 call Draw
+1 call Draw	;  $902f Para breakpoint. 
 
 ;	IX contiene (Puntero_de_impresion)
 ;	IY contiene (Puntero_objeto)
 
-
 	call Calcula_Columnitas
 	call Codifica_Puntero_de_impresion
 
+	ld hl,(Posicion_actual)
+	ld a,l
+	and $1f
+	cp 1
+	jr z,$
+
 ; debug !!!!!!!!!!!!!!!!!!!
 
-;	Puntero_de_impresion $8bef ..... $47c0
-;	Columns $8bf9 	  		   ..... 2						
-;	Posicion_actual $8bfa	   ..... $4e00							
-;	CTRL_DESPLZ $8bfe		   ..... $00
-;	Puntero_objeto $8bfc	   ..... $839e	
-;	Puntero_DESPLZ_der $8c03   ..... $8530
-;	Puntero_DESPLZ_izq $8c05   ..... $838e 
-;	Cuad_objeto $8c09		   ..... 1									; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
-;	Columnas $8c0a			   ..... 1
-;	Columnitas $8c0b		   ..... 1	
-;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $e340
-
-;	ld hl,(Posicion_actual)
-;	ld a,l
-;	and a
-;	jr z,$
+;	Puntero_de_impresion $8bef ..... $4780 ..... $4780 ..... $4680 ..... $4680
+;	Columns $8bf9 	  		   ..... 3	   ..... 3	   ..... 2	   ..... 3			
+;	Posicion_actual $8bfa	   ..... $46c0 ..... $46c0 ..... $45c0 ..... $45c1					
+;	CTRL_DESPLZ $8bfe		   ..... $fa   ..... $fc   ..... $00   ..... $f9
+;	Puntero_objeto $8bfc	   ..... $85d2 ..... $8632 ..... $8541 ..... $85a1
+;	Puntero_DESPLZ_der $8c03   ..... $8536 ..... $853a ..... $8530 ..... $8534
+;	Puntero_DESPLZ_izq $8c05   ..... $8398 ..... $8394 ..... $838e ..... $839a
+;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   ..... 1	   ..... 1								; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+;	Columnas $8c0a			   ..... 1     ..... 1     ..... 1     ..... 2
+;	Columnitas $8c0b		   ..... 1	   ..... 1     ..... 1     ..... 2
+;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df74 ..... $df78 ..... $df7c ..... $df80
 
 	call Guarda_movimiento_masticado
 
 	call Movimiento
 
-	ld a,(Ctrl_3)											; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
-	bit 1,a 												; _ que corresponde a esta entidad.
+	ld a,(Ctrl_3)																					; El bit1 de (Ctrl_3) a "1" indica que hemos completado todo el patrón de movimiento_
+	bit 1,a 																						; _ que corresponde a esta entidad.
 	jr z,1B
 
 ;	Hemos completado el almacén de movimientos masticados de la entidad.
@@ -1627,12 +1627,17 @@ Ajusta_Puntero_objeto
 
 	ld a,(Columnitas)
 	ld b,a
-	ld a,3
+
+	ld a,(Columns)
 	sub b	
+	ret z
+
 	ld b,a
 
 1 inc iyl
 	djnz 1B	
+
+	ld (Puntero_objeto),iy
 
 	ret
 
