@@ -186,10 +186,6 @@ Mov_right ld a,(Ctrl_0)
 	and a 															; _[3] para continuar con el DESPLZ.
 	jr z,8F 														 														
 
-
-;	jr $
-
-
 ; ---------- ---------- ----------
 ;
 ;	Estamos en el último char. de la fila y (CTRL_DESPLZ) es distinto de "0".
@@ -225,6 +221,24 @@ Mov_right ld a,(Ctrl_0)
 
 3 
 	call Reaparece_izquierda 										; Despues de haber actualizado la coordenada X del Sprite, (de 0 a 31). Si el movimiento es al char. _
+	call Draw
+
+; 	debug !!!!!!!!!!!!!!!!!!!
+
+;	Puntero_de_impresion $8bef ..... $0000 ..... $4780
+;	Columns $8bf9 	  		   ..... 3	   ..... 3				
+;	Posicion_actual $8bfa	   ..... $46c0 ..... $46c0					
+;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $fe
+;	Puntero_objeto $8bfc	   ..... $8690 ..... $8690
+;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $853e
+;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $8390
+;	Cuad_objeto $8c09		   ..... 2	   ..... 1								; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+;	Columnas $8c0a			   ..... 1     ..... 1
+;	Columnitas $8c0b		   ..... 1	   ..... 1
+;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df74
+
+;	jr $
+
 ;	call Reinicio
 
 ; ---------- ---------- ----------
@@ -241,9 +255,23 @@ Mov_right ld a,(Ctrl_0)
 	ld (Posicion_actual),hl
 	call Genera_coordenadas
 
-	jr 2F 															; Salimos para pintar la nueva posición.
+; 	debug !!!!!!!!!!!!!!!!!!!
 
-; ---------- ---------- ----------
+;	Puntero_de_impresion $8bef ..... $0000 ..... $4780 ..... $4780
+;	Columns $8bf9 	  		   ..... 3	   ..... 3	   ..... 3
+;	Posicion_actual $8bfa	   ..... $46c0 ..... $46c0 ..... $46c0				
+;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $fe   ..... $fa
+;	Puntero_objeto $8bfc	   ..... $8690 ..... $8690 ..... $85d0
+;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $853e ..... $8536
+;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $8390 ..... $8398
+;	Cuad_objeto $8c09		   ..... 2	   ..... 1	   ..... 1						; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+;	Columnas $8c0a			   ..... 1     ..... 1     ..... 1
+;	Columnitas $8c0b		   ..... 1	   ..... 1     ..... 1
+;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df74 ..... $df74
+
+	ret
+																	
+; ---------- ---------- ---------
 
 8 ld hl,(Posicion_actual)
 	call DESPLZ_DER

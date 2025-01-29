@@ -1447,8 +1447,29 @@ Construye_movimientos_masticados_entidad
 ;	IX contiene (Puntero_de_impresion)
 ;	IY contiene (Puntero_objeto)
 
+
 	call Calcula_Columnitas
 	call Codifica_Puntero_de_impresion
+
+; debug !!!!!!!!!!!!!!!!!!!
+
+;	Puntero_de_impresion $8bef ..... $47c0
+;	Columns $8bf9 	  		   ..... 2						
+;	Posicion_actual $8bfa	   ..... $4e00							
+;	CTRL_DESPLZ $8bfe		   ..... $00
+;	Puntero_objeto $8bfc	   ..... $839e	
+;	Puntero_DESPLZ_der $8c03   ..... $8530
+;	Puntero_DESPLZ_izq $8c05   ..... $838e 
+;	Cuad_objeto $8c09		   ..... 1									; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+;	Columnas $8c0a			   ..... 1
+;	Columnitas $8c0b		   ..... 1	
+;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $e340
+
+;	ld hl,(Posicion_actual)
+;	ld a,l
+;	and a
+;	jr z,$
+
 	call Guarda_movimiento_masticado
 
 	call Movimiento
