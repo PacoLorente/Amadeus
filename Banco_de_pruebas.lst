@@ -2523,7 +2523,7 @@
 1465  9042              ;	Puntero_objeto $8bfc	   ..... $85d2 ..... $8632 ..... $8541 ..... $85a1
 1466  9042              ;	Puntero_DESPLZ_der $8c03   ..... $8536 ..... $853a ..... $8530 ..... $8534
 1467  9042              ;	Puntero_DESPLZ_izq $8c05   ..... $8398 ..... $8394 ..... $838e ..... $839a
-1468  9042              ;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   ..... 1	   ..... 1								; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
+1468  9042              ;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   ..... 1	   ..... 1
 1469  9042              ;	Columnas $8c0a			   ..... 1     ..... 1     ..... 1     ..... 2
 1470  9042              ;	Columnitas $8c0b		   ..... 1	   ..... 1     ..... 1     ..... 2
 1471  9042              ;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df74 ..... $df78 ..... $df7c ..... $df80
