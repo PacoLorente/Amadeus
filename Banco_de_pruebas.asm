@@ -431,6 +431,12 @@ Ctrl_3 db 0												; 2º Byte de Ctrl. general, (no específico) a una únic
 Ctrl_4 db 0												; 4º Byte de Ctrl. general, (no específico) a una única entidad.																		
 ;
 ;															BIT 0, "1" Cada vez que se incrementan las entidades en curso, este bit se pone a "1". Esto hará que una entidad pase de "dormida" a "activa".
+;															BIT 1, "1" Indica que hemos aparecido por la parte IZQUIERDA de la pantalla.
+
+
+
+
+
 
 Ctrl_5 db 0												;	BIT 1, "1" Indica que la entidad en curso es la alcanzada por nuestro disparo. La comparativa entre coordenadas ha sido satisfactoria. 
 ;															BIT	2, "1" Indica que tras consecutivos desplazamientos del disparo hay que modificar el (Puntero_de_impresión) dos posiciones a la derecha.
@@ -1442,12 +1448,11 @@ Construye_movimientos_masticados_entidad
 ;															; Inicializa (Puntero_objeto) en función de la (Posicion_inicio) de la entidad.	
 	call Recompone_posicion_inicio
 
-1 call Draw	;  $902f Para breakpoint. 
+1 call Draw	
 
 ;	IX contiene (Puntero_de_impresion)
 ;	IY contiene (Puntero_objeto)
 
-	call Calcula_Columnitas
 	call Codifica_Puntero_de_impresion
 
 ; debug !!!!!!!!!!!!!!!!!!!
@@ -1455,27 +1460,27 @@ Construye_movimientos_masticados_entidad
 	ld hl,(Posicion_actual)
 	ld a,l
 	and $1f
-	cp 1
+	cp 2
 	jr nz,2F
 
-	ld a,(CTRL_DESPLZ)
-	cp $fe
-	jr z,$
+;	ld a,(CTRL_DESPLZ)
+;	cp $fe
+;	jr z,$
 
+	jr $
 
-
-
-;	Puntero_de_impresion $8bef ..... $4580 ..... $4581 --- ( $4580 Antes de DRAW.) 
-;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- ( 3       "       "   )
-;	Posicion_actual $8bfa	   ..... $44c1 ..... $44c2 --- ( $44c2   "       "	 )			
-;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $f8   --- ( $f8     "       "   )
-;	Puntero_objeto $8bfc	   ..... $8691 ..... $8570 --- ( $8570   "       "   )
-;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $8532 --- ( $8532   "       "   )
-;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $839c --- ( $839c   "       "   )
-;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- ( 1       "       "   )		
-;	Columnas $8c0a			   ..... 2     ..... 2     --- ( 2       "       "   )
-;	Columnitas $8c0b		   ..... 2     ..... 3     --- ( 2       "       "   )
-;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df88 ..... $df8c
+;	Puntero_de_impresion $8bef ..... $4580 ..... $4580 ---   							  
+;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- 	 							  
+;	Posicion_actual $8bfa	   ..... $44c1 ..... $44c2 --- 	 							  
+;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $f8   --- 	 							  
+;	Puntero_objeto $8bfc	   ..... $8691 ..... $8570 --- 	  						      
+;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $8532 ---   							  
+;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $839c ---   							  
+;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- 	 							  
+;	Columnas $8c0a			   ..... 2     ..... 2     ---   							  
+;	Columnitas $8c0b		   ..... 2     ..... 3     ---    							  
+;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df88 ..... $df8c 					
+;	Ctrl_4 $8c63 --- 0
 
 2 call Guarda_movimiento_masticado
 

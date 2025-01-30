@@ -34,6 +34,7 @@ Draw
 ; -----------------------
 
 3 call calcula_CColumnass							; Define el valor de la variable (Columnas). Nº de columnas que se van a pintar de la entidad.
+	call Calcula_Columnitas
 	call Calcula_puntero_de_impresion				; Después de ejecutar esta rutina tenemos el puntero de impresión en HL.
 
 	ld a,(Ctrl_0)									; Antes de salir de la rutina REStauramos el bit5 de Ctrl_0 para que nos vuelva_
@@ -488,7 +489,9 @@ calcula_CColumnass ld a,(Cuad_objeto)
 ;
 ;	DESTRUYE: HL,B Y A.	
 
-Calcula_puntero_de_impresion ld a,(Cuad_objeto)
+Calcula_puntero_de_impresion 
+
+	ld a,(Cuad_objeto)
 	cp 2
 	jr c,1F
 	jr z,1F
@@ -502,7 +505,25 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 9 ld a,l
 	and $1f
 	jr z,7F
-	dec hl
+
+	cp 2
+	jr nz,10F
+
+; Nos encontramos en la Columna 2 de pantalla, hemos reaparecido por la parte izquierda ???
+; Corrige el fallo de la reentrada de la entidad por la parte izquierda de la pantalla.
+
+	ld a,(Ctrl_4)
+	bit 1,a
+	jr z,10F
+
+; Bit 1 de (Ctrl_4) a "1" indica que hemos reaparecido por la parte izquierda de la pantalla. 
+
+	res 1,a
+	ld (Ctrl_4),a
+	ld hl,(Puntero_de_impresion)
+	jr 12F
+
+10 dec hl
 	djnz 9B
 	jr 7F
 
@@ -520,7 +541,25 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 4 ld a,l
 	and $1f
 	jr z,6F
-	dec hl
+
+	cp 2
+	jr nz,11F
+
+; Nos encontramos en la Columna 2 de pantalla, hemos reaparecido por la parte izquierda ???
+; Corrige el fallo de la reentrada de la entidad por la parte izquierda de la pantalla.
+
+	ld a,(Ctrl_4)
+	bit 1,a
+	jr z,11F
+
+; Bit 1 de (Ctrl_4) a "1" indica que hemos reaparecido por la parte izquierda de la pantalla. 
+
+	res 1,a
+	ld (Ctrl_4),a
+	ld hl,(Puntero_de_impresion)
+	jr 12F
+
+11 dec hl
 	djnz 4B
 6 ld b,15
 5 call PreviousScan
@@ -534,7 +573,9 @@ Calcula_puntero_de_impresion ld a,(Cuad_objeto)
 8 call PreviousScan
 	djnz 8B
 
-7 push hl
+7 ld (Puntero_de_impresion),hl
+
+12 push hl
 	pop ix
 
 	ld hl,(Puntero_objeto)

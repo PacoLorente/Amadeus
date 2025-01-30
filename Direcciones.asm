@@ -749,8 +749,13 @@ Reaparece_izquierda
 	and a
 	sbc hl,bc
 	ld (Posicion_actual),hl 											; $xx1x
+
 	ld hl,Ctrl_0
 	set 1,(hl)
+
+	ld hl,Ctrl_4
+	set 1,(hl)
+
 	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
@@ -760,8 +765,10 @@ Reaparece_abajo inc h
 	and a
 	adc hl,bc
 	ld (Posicion_actual),hl
+
 	ld hl,Ctrl_0
 	set 2,(hl)
+
 	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
