@@ -290,8 +290,14 @@ DESPLZ_DER call Desplaza_derecha
 	ret
 
 ; ******************************************************************************************************************************************************************************************
-;	15/02/23
 ;
+;	30/01/25
+;
+;	Sitúa (Puntero_objeto) y los punteros de desplazamiento correspondientes: (Puntero_DESPLZ_der) y (Puntero_DESPLZ_izq) en función de la velocidad del desplazamiento, (Vel_right).
+;
+;	OUTPUT: (Puntero_objeto).
+;			(Puntero_DESPLZ_der).
+;			(Puntero_DESPLZ_izq).
 
 Desplaza_derecha ld a,(Vel_right)
 	ld b,a
@@ -389,7 +395,7 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;
-;	24/7/22
+;	30/01/25
 ;
 ;	Ciclo_completo.
 ;
@@ -405,7 +411,7 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 	cp $ff
 	jr z,1F 												     ; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
 	and $f0
-	jr nz,3F
+	ret nz
 
 ; (CTRL_DESPLZ) fuera de rango, (por encima de $ff), hay que reajustar.	
 
@@ -414,7 +420,7 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 	ld a,$f8
 	add b
 	ld (CTRL_DESPLZ),a 
-	jr 3F
+	ret
 
 1 ld hl,Columns													 ; Tras 8 desplazamientos el objeto desplazado es igual al original.
 	dec (hl) 													 ; Decrementamos el nº de (Columns).
@@ -433,7 +439,7 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 ; Inicia el puntero de Sprite.
 
 2 call Inicia_puntero_objeto_der
-3 ret
+	ret
 
 ; ******************************************************************************************************************************************************************************************
 ;
@@ -683,10 +689,9 @@ Stop_Amadeus_left ld a,(Coordenada_X)	 	  										 ; Posición horizontal de A
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 ;
-;	24/7/22
+;	30/1/25
 ;
 ;	Inc_CTRL_DESPLZ
-;
 ;
 ;   Incrementa el valor del byte de control, (CTRL_DESPLZ) en función del nº de veces que hayamos desplazado el objeto, (Vel_right).	
 
@@ -695,18 +700,19 @@ Inc_CTRL_DESPLZ ld hl,CTRL_DESPLZ
 	and a
 	jr z,1F
 	ld b,a
+
 3 inc (hl)	 								 						 
 	djnz 3B
-	jr 2F
+	ret
+
 1 inc (hl)
-2 ret
+	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 ;
-;	5/2/23
+;	30/1/25
 ;
 ;	Dec_CTRL_DESPLZ
-;
 ;
 ;   Decrementa el valor del byte de control, (CTRL_DESPLZ) en función del nº de veces que hayamos desplazado el objeto, (Vel_right).	
 
@@ -715,11 +721,13 @@ Dec_CTRL_DESPLZ ld hl,CTRL_DESPLZ
 	and a
 	jr z,1F
 	ld b,a
+
 3 dec (hl)	 								 						 
 	djnz 3B
-	jr 2F
+	ret
+
 1 dec (hl)
-2 ret
+	ret
 
 ; ---------- ---------- ---------- ---------- ---------- ----------
 

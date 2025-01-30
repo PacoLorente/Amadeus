@@ -1450,27 +1450,34 @@ Construye_movimientos_masticados_entidad
 	call Calcula_Columnitas
 	call Codifica_Puntero_de_impresion
 
+; debug !!!!!!!!!!!!!!!!!!!
+
 	ld hl,(Posicion_actual)
 	ld a,l
 	and $1f
 	cp 1
+	jr nz,2F
+
+	ld a,(CTRL_DESPLZ)
+	cp $fe
 	jr z,$
 
-; debug !!!!!!!!!!!!!!!!!!!
 
-;	Puntero_de_impresion $8bef ..... $4780 ..... $4780 ..... $4680 ..... $4680
-;	Columns $8bf9 	  		   ..... 3	   ..... 3	   ..... 2	   ..... 3			
-;	Posicion_actual $8bfa	   ..... $46c0 ..... $46c0 ..... $45c0 ..... $45c1					
-;	CTRL_DESPLZ $8bfe		   ..... $fa   ..... $fc   ..... $00   ..... $f9
-;	Puntero_objeto $8bfc	   ..... $85d2 ..... $8632 ..... $8541 ..... $85a1
-;	Puntero_DESPLZ_der $8c03   ..... $8536 ..... $853a ..... $8530 ..... $8534
-;	Puntero_DESPLZ_izq $8c05   ..... $8398 ..... $8394 ..... $838e ..... $839a
-;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   ..... 1	   ..... 1								
-;	Columnas $8c0a			   ..... 1     ..... 1     ..... 1     ..... 2
-;	Columnitas $8c0b		   ..... 1	   ..... 1     ..... 1     ..... 2
-;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df74 ..... $df78 ..... $df7c ..... $df80
 
-	call Guarda_movimiento_masticado
+
+;	Puntero_de_impresion $8bef ..... $4580 ..... $4581 --- ( $4580 Antes de DRAW.) 
+;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- ( 3       "       "   )
+;	Posicion_actual $8bfa	   ..... $44c1 ..... $44c2 --- ( $44c2   "       "	 )			
+;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $f8   --- ( $f8     "       "   )
+;	Puntero_objeto $8bfc	   ..... $8691 ..... $8570 --- ( $8570   "       "   )
+;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $8532 --- ( $8532   "       "   )
+;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $839c --- ( $839c   "       "   )
+;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- ( 1       "       "   )		
+;	Columnas $8c0a			   ..... 2     ..... 2     --- ( 2       "       "   )
+;	Columnitas $8c0b		   ..... 2     ..... 3     --- ( 2       "       "   )
+;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df88 ..... $df8c
+
+2 call Guarda_movimiento_masticado
 
 	call Movimiento
 
