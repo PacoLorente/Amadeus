@@ -375,9 +375,9 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 	ld (Posicion_actual),hl
 
 	call Genera_coordenadas
-
 	call Inc_CTRL_DESPLZ
-	jr 2F
+	ret
+
 1 call Inc_CTRL_DESPLZ
 2 ret
 

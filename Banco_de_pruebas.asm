@@ -1464,22 +1464,22 @@ Construye_movimientos_masticados_entidad
 	jr nz,2F
 
 	ld a,(CTRL_DESPLZ)
-	cp $fd
+	cp $fa
 	jr z,$
 
 ;	jr $
 
-;	Puntero_de_impresion $8bef ..... $4580 ..... $4580 ---   $4580 --- $4580							  
-;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- 	 3	   --- 3						  
-;	Posicion_actual $8bfa	   ..... $44c1 ..... $44c2 --- 	 $44c2 --- $43c2							  
-;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $f8   --- 	 $fa   --- $fd							  
-;	Puntero_objeto $8bfc	   ..... $8691 ..... $8570 --- 	 $85d0 --- $8660						      
-;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $8532 ---   $8536 --- $853c							  
-;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $839c ---   $8398 --- $8392							  
-;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- 	 1	   --- 1						  
-;	Columnas $8c0a			   ..... 2     ..... 2     ---   2	   --- 3						  
-;	Columnitas $8c0b		   ..... 2     ..... 3     ---   3 	   --- 3						  
-;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df88 ..... $df8c ..... $df90 ..... $df94				
+;	Puntero_de_impresion $8bef ..... $4580 ..... $4580 ---   $4580 --- $4580 --- $4580							  
+;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- 	 3	   --- 3	 --- 3					  
+;	Posicion_actual $8bfa	   ..... $44c1 ..... $44c2 --- 	 $44c2 --- $43c2 --- $43c2							  
+;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $f8   --- 	 $fa   --- $fd	 --- $fe						  
+;	Puntero_objeto $8bfc	   ..... $8691 ..... $8570 --- 	 $85d0 --- $8660 --- $8690						      
+;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $8532 ---   $8536 --- $853c --- $853e							  
+;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $839c ---   $8398 --- $8392 --- $8390							  
+;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- 	 1	   --- 1	 --- 1					  
+;	Columnas $8c0a			   ..... 2     ..... 2     ---   2	   --- 3	 --- 3					  
+;	Columnitas $8c0b		   ..... 2     ..... 3     ---   3 	   --- 3	 --- 3					  
+;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df88 ..... $df8c ..... $df90 ..... $df94 ..... $				
 ;	Ctrl_4 $8c63 --- 0
 
 2 call Guarda_movimiento_masticado
