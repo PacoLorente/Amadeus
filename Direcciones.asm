@@ -254,21 +254,6 @@ Mov_right ld a,(Ctrl_0)
 	dec hl 															; _ (Posicion_actual) ha pasado de $00 a $01.
 	ld (Posicion_actual),hl
 	call Genera_coordenadas
-
-; 	debug !!!!!!!!!!!!!!!!!!!
-
-;	Puntero_de_impresion $8bef ..... $0000 ..... $4780 ..... $4780
-;	Columns $8bf9 	  		   ..... 3	   ..... 3	   ..... 3
-;	Posicion_actual $8bfa	   ..... $46c0 ..... $46c0 ..... $46c0				
-;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $fe   ..... $fa
-;	Puntero_objeto $8bfc	   ..... $8690 ..... $8690 ..... $85d0
-;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $853e ..... $8536
-;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $8390 ..... $8398
-;	Cuad_objeto $8c09		   ..... 2	   ..... 1	   ..... 1						; Almacena el cuadrante de pantalla donde se encuentra el objeto, (1,2,3,4). [DRAW]
-;	Columnas $8c0a			   ..... 1     ..... 1     ..... 1
-;	Columnitas $8c0b		   ..... 1	   ..... 1     ..... 1
-;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df74 ..... $df74
-
 	ret
 																	
 ; ---------- ---------- ---------
@@ -330,12 +315,15 @@ Desplaza_derecha ld a,(Vel_right)
 4 inc b
 	inc a
 	jr nz,4B
+
 	ld a,b
 	ex af,af
 	ld hl,(Indice_Sprite_der)
+
 5 inc hl
 	inc hl
 	djnz 5B
+
 	ld (Puntero_DESPLZ_der),hl
 	call Extrae_address
 	ld (Puntero_objeto),hl			

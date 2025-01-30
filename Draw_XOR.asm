@@ -479,7 +479,7 @@ calcula_CColumnass ld a,(Cuad_objeto)
 
 ; --------------------------------------------------------------------------------------------------------------------
 ;
-;   19/7/23
+;   30/01/25
 ;
 ;	Calcula el puntero de impresión del sprite, (arriba-izquierda).
 ;	Almacena en IY (Puntero_objeto). La rutina de impresión requiere de esta dirección para situar el SP a la hora de pintar.
@@ -518,8 +518,6 @@ Calcula_puntero_de_impresion
 
 ; Bit 1 de (Ctrl_4) a "1" indica que hemos reaparecido por la parte izquierda de la pantalla. 
 
-	res 1,a
-	ld (Ctrl_4),a
 	ld hl,(Puntero_de_impresion)
 	jr 12F
 
@@ -554,8 +552,6 @@ Calcula_puntero_de_impresion
 
 ; Bit 1 de (Ctrl_4) a "1" indica que hemos reaparecido por la parte izquierda de la pantalla. 
 
-	res 1,a
-	ld (Ctrl_4),a
 	ld hl,(Puntero_de_impresion)
 	jr 12F
 
