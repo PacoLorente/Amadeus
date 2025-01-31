@@ -1460,27 +1460,21 @@ Construye_movimientos_masticados_entidad
 	ld hl,(Posicion_actual)
 	ld a,l
 	and $1f
-	cp 2
-	jr nz,2F
-
-	ld a,(CTRL_DESPLZ)
-	cp $fa
 	jr z,$
 
-;	jr $
+ ;                                   Columna  ..... 0        Columna ..... 1
 
-;	Puntero_de_impresion $8bef ..... $4580 ..... $4580 ---   $4580 --- $4580 --- $4580							  
-;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- 	 3	   --- 3	 --- 3					  
-;	Posicion_actual $8bfa	   ..... $44c1 ..... $44c2 --- 	 $44c2 --- $43c2 --- $43c2							  
-;	CTRL_DESPLZ $8bfe		   ..... $fe   ..... $f8   --- 	 $fa   --- $fd	 --- $fe						  
-;	Puntero_objeto $8bfc	   ..... $8691 ..... $8570 --- 	 $85d0 --- $8660 --- $8690						      
-;	Puntero_DESPLZ_der $8c03   ..... $853e ..... $8532 ---   $8536 --- $853c --- $853e							  
-;	Puntero_DESPLZ_izq $8c05   ..... $8390 ..... $839c ---   $8398 --- $8392 --- $8390							  
-;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- 	 1	   --- 1	 --- 1					  
-;	Columnas $8c0a			   ..... 2     ..... 2     ---   2	   --- 3	 --- 3					  
-;	Columnitas $8c0b		   ..... 2     ..... 3     ---   3 	   --- 3	 --- 3					  
-;	Puntero_de_almacen_de_mov_masticados $8bf1 ..... $df88 ..... $df8c ..... $df90 ..... $df94 ..... $				
-;	Ctrl_4 $8c63 --- 0
+;	Puntero_de_impresion $8bef ..... $4780 ..... $4780 ---   $4680 .....							  
+;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- 	 2	   .....				  
+;	Posicion_actual $8bfa	   ..... $46c0 ..... $46c0 --- 	 $45c1 .....							  
+;	CTRL_DESPLZ $8bfe		   ..... $fa   ..... $fc   --- 	 $00   .....						  
+;	Puntero_objeto $8bfc	   ..... $85d2 ..... $8632 --- 	 $8540 .....						      
+;	Puntero_DESPLZ_der $8c03   ..... $8536 ..... $853a ---   $8530 .....							  
+;	Puntero_DESPLZ_izq $8c05   ..... $8398 ..... $8394 ---   $838e .....							  
+;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- 	 1	   .....					  
+;	Columnas $8c0a			   ..... 1     ..... 1     ---   2	   .....					  
+;	Columnitas $8c0b		   ..... 1     ..... 1     ---   2 	   .....					  
+;	Puntero_de_almacen_d $8bf1 ..... $df74 ..... $df78 ..... $df7c ..... 		
 
 2 call Guarda_movimiento_masticado
 
@@ -1535,42 +1529,6 @@ Guarda_movimiento_masticado
     call Actualiza_Puntero_de_almacen_de_mov_masticados 	; Actualizamos (Puntero_de_almacen_de_mov_masticados) e incrementa_
 ;															; _ el (Contador_de_mov_masticados).    
     ret
-
-; --------------------------------------------------------------------------------------------------------------
-;
-;	27/01/2025
-;
-;	INPUTS: IX contiene (Puntero_de_impresion)
-;			IY contiene (Puntero_objeto)
-
-Calcula_Columnitas
-
-	ld a,3
-	ld (Columnitas),a
-
-	ld hl,(Posicion_actual)
-	ld a,l
-	and $1f
-	and a
-	jr z,Una_columnita
-	dec a
-	jr z,Dos_columnitas
-	inc a
-
-	cp $1d
-	ret c
-	ret z
-
-	inc a
-	and $1f
-	jr z,Una_columnita
-
-Dos_columnitas ld a,2
-	jr 1F
-Una_columnita ld a,1
-1 ld (Columnitas),a
-
-	ret
 
 ; --------------------------------------------------------------------------------------------------------------
 ;

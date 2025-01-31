@@ -477,6 +477,38 @@ calcula_CColumnass ld a,(Cuad_objeto)
 	exx
  ret	
 
+; --------------------------------------------------------------------------------------------------------------
+;
+;	31/01/2025
+;
+
+Calcula_Columnitas
+
+	ld a,(Columnas)
+	ld (Columnitas),a
+
+	ld hl,(Posicion_actual)
+	ld a,l
+	and $1f
+	jr z,Una_columnita
+
+	dec a
+	jr z,Dos_columnitas
+
+	inc a
+
+	cp $1e
+	ret c
+	
+	jr z,Dos_columnitas
+
+Una_columnita ld a,1
+1 ld (Columnitas),a
+	ret
+
+Dos_columnitas ld a,2
+	jr 1B
+
 ; --------------------------------------------------------------------------------------------------------------------
 ;
 ;   30/01/25
@@ -490,6 +522,9 @@ calcula_CColumnass ld a,(Cuad_objeto)
 ;	DESTRUYE: HL,B Y A.	
 
 Calcula_puntero_de_impresion 
+
+	ld hl,$
+
 
 	ld a,(Cuad_objeto)
 	cp 2

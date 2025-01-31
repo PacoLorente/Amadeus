@@ -12,26 +12,28 @@
 
 Recompone_posicion_inicio 
 
-	ld hl,(Posicion_inicio) 
-	ld a,l
-	and $1f
-	jr z,1F
+;;	ld hl,(Posicion_inicio) 
+;	ld a,l
+;	and $1f
+;	jr z,1F
 
-	cp $1f
-	jr z,3F
+;	cp $1f
+;	jr z,3F
 
 	ld hl,Ctrl_2
 	set 0,(hl)
+
 	ld hl,(Puntero_objeto)
 	ld (Repone_puntero_objeto),hl
-	jr 2F
+;	jr 2F
 
-3 call Mov_left
-	jr 2F
+;3 call Mov_left
+;	jr 2F
 
-1 call Mov_right
+;1 call Mov_right
 2 ld hl,Sprite_vacio
 	ld (Puntero_objeto),hl
+
 	ret
 
 ; ******************************************************************************************************************************************************************************************
@@ -307,6 +309,14 @@ Desplaza_derecha ld a,(Vel_right)
 	srl l
 6 ld a,8
 	sub l
+
+;! PROVISIONAL !!!!!!!!!!!!!!!!!
+
+	call z,Inicia_puntero_objeto_der ; Creo que hay que reinicializar punteros.
+	ret z
+
+;! PROVISIONAL !!!!!!!!!!!!!!!!!
+
 	jr nc,3F	
 
 ; Hemos salido del índice. Hay que ajustar (Puntero_DESPLZ_der) dentro del mismo.
@@ -360,6 +370,7 @@ Desplaza_derecha ld a,(Vel_right)
 modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª de (Columns) cuando desplazamos el objeto por 1ª vez.
 	and a
 	jr nz,1F
+
     sub 9                							              ; Situamos en $f7 el valor de partida de (CTRL_DESPLZ) tras el 1er desplazamiento. 
     ld (CTRL_DESPLZ),a
 
@@ -398,6 +409,7 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 Ciclo_completo ld a,(CTRL_DESPLZ)
 	cp $ff
 	jr z,1F 												     ; Salimos de la rutina si no hemos completado 8 o más desplazamientos.
+
 	and $f0
 	ret nz
 
@@ -417,16 +429,24 @@ Ciclo_completo ld a,(CTRL_DESPLZ)
 
 	ld a,(Cuad_objeto) 											 ; Si estamos situados en el cuadrante 1º o 3º de la pantalla no modificamos_
 	and 1 														 ; _(Posicion_actual). Limpiamos la (Caja_de_DESPLZ) y salimos.
-	jr nz,2F
+	jr z,2F
 
-	ld hl,(Posicion_actual)                                      ; Incrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
-	inc hl
+;! Estamos reapareciendo por el lado izquierdo ????????
+
+	ld a,(Ctrl_4)
+	bit 1,a
+	ret z
+
+;	Si estamos reapareciendo por la izquierda hemos de incrementar (Posicion_actual).
+
+;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+2 ld hl,(Posicion_actual)                                      ; Incrementamos (Posicion_actual) en los cuadrantes 2º y 4º.
+	inc l
 	ld (Posicion_actual),hl
+
 	call Genera_coordenadas
 
-; Inicia el puntero de Sprite.
-
-2 call Inicia_puntero_objeto_der
 	ret
 
 ; ******************************************************************************************************************************************************************************************
