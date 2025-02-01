@@ -1460,21 +1460,22 @@ Construye_movimientos_masticados_entidad
 	ld hl,(Posicion_actual)
 	ld a,l
 	and $1f
+	cp 1
 	jr z,$
 
  ;                                   Columna  ..... 0        Columna ..... 1
 
-;	Puntero_de_impresion $8bef ..... $4780 ..... $4780 ---   $4680 .....							  
-;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- 	 2	   .....				  
-;	Posicion_actual $8bfa	   ..... $46c0 ..... $46c0 --- 	 $45c1 .....							  
-;	CTRL_DESPLZ $8bfe		   ..... $fa   ..... $fc   --- 	 $00   .....						  
-;	Puntero_objeto $8bfc	   ..... $85d2 ..... $8632 --- 	 $8540 .....						      
-;	Puntero_DESPLZ_der $8c03   ..... $8536 ..... $853a ---   $8530 .....							  
-;	Puntero_DESPLZ_izq $8c05   ..... $8398 ..... $8394 ---   $838e .....							  
-;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- 	 1	   .....					  
-;	Columnas $8c0a			   ..... 1     ..... 1     ---   2	   .....					  
-;	Columnitas $8c0b		   ..... 1     ..... 1     ---   2 	   .....					  
-;	Puntero_de_almacen_d $8bf1 ..... $df74 ..... $df78 ..... $df7c ..... 		
+;	Puntero_de_impresion $8bef ..... $4780 ..... $4780 ---   $4680 ..... $4680							  
+;	Columns $8bf9 	  		   ..... 3     ..... 3	   --- 	 2	   ..... 3				  
+;	Posicion_actual $8bfa	   ..... $46c0 ..... $46c0 --- 	 $45c1 ..... $45c1							  
+;	CTRL_DESPLZ $8bfe		   ..... $fa   ..... $fc   --- 	 $00   ..... $f9						  
+;	Puntero_objeto $8bfc	   ..... $85d2 ..... $8632 --- 	 $8541 ..... $85a1						      
+;	Puntero_DESPLZ_der $8c03   ..... $8536 ..... $853a ---   $8530 ..... $8534						  
+;	Puntero_DESPLZ_izq $8c05   ..... $8398 ..... $8394 ---   $838e ..... $839a						  
+;	Cuad_objeto $8c09		   ..... 1	   ..... 1	   --- 	 1	   ..... 1					  
+;	Columnas $8c0a			   ..... 1     ..... 1     ---   2	   ..... 2					  
+;	Columnitas $8c0b		   ..... 1     ..... 1     ---   2 	   ..... 2					  
+;	Puntero_de_almacen_d $8bf1 ..... $df74 ..... $df78 ..... $df7c ..... $df80		
 
 2 call Guarda_movimiento_masticado
 
@@ -1579,7 +1580,7 @@ Codificamos_dos_Columnitas
 	and 1
 	ret z
 
-	call Ajusta_Puntero_objeto
+ 	call Ajusta_Puntero_objeto
 
 	ret
 
@@ -1595,14 +1596,37 @@ Codificamos_una_Columnita
 
 Ajusta_Puntero_objeto 
 
+;	Vamos a imprimir "1" o "2" Columnas en la parte izquierda de la pantalla.
+
 	ld a,(Columnitas)
 	ld b,a
-
 	ld a,(Columns)
 	sub b	
+	jr nz,2F
+
+;	Cuando estamos apareciendo por el lado izquierdo:
+;
+;	(Columns)-(Columnitas)="0"
+;	2-2=0, No deberíamos modificar (Puntero_objeto) pero al estar "APARECIENDO" necesitamos imprimir las 2 últimas columnas del Sprite en lugar de las 2 primeras.
+
+; B contiene (Columnitas)
+;	Desplazamos a derecha ... NZ,2F
+;	dec b
+;	dec b
+;	jr nz,2F
+
+	ld a,(Columnitas)
+	cp 2
+	jr nz,2F
+
+	ld a,(Ctrl_4)
+	bit 1,a
 	ret z
 
-	ld b,a
+	ld b,1
+	jr 1F
+
+2 ld b,a
 
 1 inc iyl
 	djnz 1B	

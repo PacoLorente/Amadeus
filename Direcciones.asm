@@ -381,6 +381,17 @@ modifica_parametros_1er_DESPLZ_2 ld a,(CTRL_DESPLZ)		 		  ; Incrementamos el nª
 	and 1
 	jr z,1F
 
+; Pasamos de "2" a "3" (Columns). Pero si estoy apareciendo por el lado izquierdo de la pantalla, NO PODEMOS incrementar (Posicion_actual).
+
+	ld a,(Ctrl_4)
+	bit 1,a
+	jr nz,$
+
+	jr nz,1F
+
+
+
+
 	ld hl,(Posicion_actual) 									  ; Incrementamos 1 char. el valor de (Posicion_actual), la primera vez que desplazamos el objeto y se encuentra en los _	
 	inc hl 														  ; _ cuadrantes 1 y 3 de pantalla.
 	ld (Posicion_actual),hl
